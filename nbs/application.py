@@ -33,7 +33,10 @@ def configure_app(app, config=None):
     if config is not None:
         app.config.from_object(config)
     else:
-        app.config.from_object('nbs.config.DevelopmentConfig')
+        try:
+            app.config.from_object('localconfig.LocalConfig')
+        except ImportError:
+            app.config.from_object('nbs.config.DevelopmentConfig')
 
     @app.before_request
     def set_page_params():

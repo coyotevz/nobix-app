@@ -9,3 +9,5 @@ docs/_build
 downloads/
 eggs/
 parts/
+
+localconfig.py
