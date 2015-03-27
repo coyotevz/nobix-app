@@ -1,0 +1,11 @@
+*.db
+*.swp
+*.pyc
+*.egg
+*.egg-info
+*.manifest
+*.so
+docs/_build
+downloads/
+eggs/
+parts/
