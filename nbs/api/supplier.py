@@ -2,9 +2,11 @@
 
 from flask import Blueprint, jsonify
 from nbs.models import Supplier
+from nbs.schema import SupplierSchema
 
 supplier_api = Blueprint('api.supplier', __name__, url_prefix='/api/suppliers')
-
+supplier_schema = SupplierSchema()
+suppliers_schema = SupplierSchema(many=True)
 
 @supplier_api.route('', methods=['GET'])
 def list():
@@ -12,7 +14,8 @@ def list():
     Returns a paginated list of suppliers that match with the given
     conditions.
     """
-    return jsonify(Supplier.query.all())
+
+    return jsonify(objects=suppliers_schema.dump(Supplier.query).data)
 
 
 @supplier_api.route('', methods=['POST'])
@@ -24,7 +27,8 @@ def add():
 def get(id):
     """Returns an individual supplier given an id"""
     supplier = Supplier.query.get_or_404(id)
-    return jsonify(supplier)
+    result = supplier_schema.dump(supplier)
+    return jsonify(result.data)
 
 
 @supplier_api.route('/<int:id>', methods=['PUT', 'PUSH'])
