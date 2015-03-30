@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from sqlalchemy.ext.associationproxy import association_proxy
+
 from nbs.models import db
 from nbs.models.entity import Entity
 from nbs.models.misc import FiscalDataMixin
@@ -27,6 +29,13 @@ class Supplier(Entity, FiscalDataMixin):
                              name='freight_type'), default=FREIGHT_CUSTOMER)
     leap_time = db.Column(db.Integer) # in days
 
+    supplier_contacts = db.relationship('SupplierContact',
+                                        cascade='all,delete-orphan',
+                                        backref='supplier')
+    contacts = association_proxy('supplier_contacts', 'contact')
+
+    #: 'bank_accounts' field added by BankAccount model
+
     @property
     def full_name(self):
         fn = " ({0})".format(self.fancy_name) if self.fancy_name else u""
@@ -35,6 +44,44 @@ class Supplier(Entity, FiscalDataMixin):
     @property
     def freight_type_str(self):
         return self._freight_types[self.freight_type]
+
+    def add_contact(self, contact, role):
+        self.supplier_contacts.append(SupplierContact(contact, role))
+
+
+class Contact(Entity):
+    __tablename__ = 'contact'
+    __mapper_args__ = {'polymorphic_identity': 'contact'}
+
+    contact_id = db.Column(db.Integer, db.ForeignKey('entity.id'),
+                           primary_key=True)
+    first_name = Entity._name_1
+    last_name = Entity._name_2
+
+
+class SupplierContact(db.Model):
+    __tablename__ = 'supplier_contact'
+    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.supplier_id'),
+                            primary_key=True)
+    contact_id = db.Column(db.Integer, db.ForeignKey('contact.contact_id'),
+                           primary_key=True)
+    role = db.Column(db.Unicode)
+
+    #: 'supplier' attribute is added by Supplier.supplier_contacts relation
+
+    contact = db.relationship('Contact', lazy='joined',
+                              backref='supplier_contacts')
+
+    def __init__(self, contact, role):
+        self.contact = contact
+        self.role = role
+
+    def __rpr__(self):
+        return "<SupplierContact {0}, {1}, {2}>".format(
+            self.supplier.name.encode('utf-8'),
+            self.role.encode('utf-8'),
+            self.contact.full_name.encode('utf-8')
+        )
 
 
 class Bank(db.Model):
