@@ -2,11 +2,12 @@
 
 from flask import Blueprint, jsonify
 from nbs.models import Supplier
-from nbs.schema import SupplierSchema
+from nbs.schema import SupplierSchema, BankAccountSchema
 
 supplier_api = Blueprint('api.supplier', __name__, url_prefix='/api/suppliers')
 supplier_schema = SupplierSchema()
 suppliers_schema = SupplierSchema(many=True)
+bank_acc_schema = BankAccountSchema(many=True, exclude=('supplier_id', 'supplier_name'))
 
 @supplier_api.route('', methods=['GET'])
 def list():
@@ -50,9 +51,9 @@ def update(id):
 def delete(id):
     return jsonify({'action': 'DELETE {0}'.format(id)})
 
+# This is a shortcut, to work with bank accounts use corresponding api
 @supplier_api.route('/<int:id>/accounts', methods=['GET'])
 def get_supplier_accounts(id):
     supplier = Supplier.query.get(id)
 
-    return jsonify(objects=[bank_acc_serializer.dump(acc).data for acc in
-                            supplier.bank_accounts])
+    return jsonify(objects=bank_acc_schema.dump(supplier.bank_accounts).data)

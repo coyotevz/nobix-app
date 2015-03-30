@@ -68,6 +68,7 @@ class SupplierContact(db.Model):
     role = db.Column(db.Unicode)
 
     #: 'supplier' attribute is added by Supplier.supplier_contacts relation
+    #: 'bank_accounts' attribute added by BankAccount.supplier relation
 
     contact = db.relationship('Contact', lazy='joined',
                               backref='supplier_contacts')
@@ -124,3 +125,7 @@ class BankAccount(db.Model):
 
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.supplier_id'))
     supplier = db.relationship(Supplier, backref='bank_accounts')
+
+    @property
+    def account_type_str(self):
+        return self._account_type[self.account_type]

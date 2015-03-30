@@ -37,3 +37,18 @@ class SupplierSchema(Schema):
 
     contacts = fields.Nested(SupplierContactSchema, attribute='supplier_contacts',
                              many=True, exclude=('supplier',))
+    bank_accounts = fields.Nested('BankAccountSchema', many=True,
+                                  only=('id', 'bank', 'type'))
+
+
+class BankAccountSchema(Schema):
+
+    id = fields.Integer()
+    bank = fields.String(attribute='bank.name')
+    branch = fields.String(attribute='bank_branch')
+    type = fields.String(attribute='account_type_str')
+    number = fields.String(attribute='account_number')
+    cbu = fields.String(attribute='account_cbu')
+    owner = fields.String(attribute='account_owner')
+    supplier_id = fields.String(attribute='supplier.id')
+    suplpier_name = fields.String(attribute='supplier.name')
