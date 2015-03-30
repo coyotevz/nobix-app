@@ -34,7 +34,6 @@ def get(id):
 @supplier_api.route('/<rangelist:ids>', methods=['GET'])
 def get_range(ids):
     suppliers = []
-    print('ids:', ids)
     for id in ids:
         s = Supplier.query.get(id)
         if s is not None:
