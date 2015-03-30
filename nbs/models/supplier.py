@@ -29,8 +29,12 @@ class Supplier(Entity, FiscalDataMixin):
 
     @property
     def full_name(self):
-        fn = u" ({0})".format(self.fancy_name) if self.fancy_name else u""
-        return u"{0}{1}".format(self.name, fn)
+        fn = " ({0})".format(self.fancy_name) if self.fancy_name else u""
+        return "{0}{1}".format(self.name, fn)
+
+    @property
+    def freight_type_str(self):
+        return self._freight_types[self.freight_type]
 
 
 class Bank(db.Model):
