@@ -8,6 +8,7 @@ from flask import Flask, request
 from nbs.models import configure_db
 #from nbs.auth import configure_auth
 from nbs.api import configure_api
+from nbs.utils import ListConverter, RangeConverter, RangeListConverter
 
 
 DEFAULT_APPNAME = 'nobix-app-server'
@@ -37,6 +38,12 @@ def configure_app(app, config=None):
             app.config.from_object('localconfig.LocalConfig')
         except ImportError:
             app.config.from_object('nbs.config.DevelopmentConfig')
+
+
+    # Add additional converters
+    app.url_map.converters['list'] = ListConverter
+    app.url_map.converters['range'] = RangeConverter
+    app.url_map.converters['rangelist'] = RangeListConverter
 
     @app.before_request
     def set_page_params():

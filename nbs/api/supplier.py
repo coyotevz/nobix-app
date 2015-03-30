@@ -31,6 +31,18 @@ def get(id):
     return jsonify(result.data)
 
 
+@supplier_api.route('/<rangelist:ids>', methods=['GET'])
+def get_range(ids):
+    suppliers = []
+    print('ids:', ids)
+    for id in ids:
+        s = Supplier.query.get(id)
+        if s is not None:
+            suppliers.append(s)
+    result = suppliers_schema.dump(suppliers)
+    return jsonify(objects=result.data)
+
+
 @supplier_api.route('/<int:id>', methods=['PUT', 'PUSH'])
 def update(id):
     return jsonify({'action': 'PUT {0}'.format(id)})
