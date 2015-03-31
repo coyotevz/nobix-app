@@ -3,11 +3,40 @@
 from marshmallow import Schema, fields
 
 
+class AddressSchema(Schema):
+
+    id = fields.Integer()
+    type = fields.String(attribute='address_type')
+    city = fields.String()
+    province = fields.String()
+    postal_code = fields.String()
+
+
+class PhoneSchema(Schema):
+
+    id = fields.Integer()
+    type = fields.String(attribute='phone_type')
+    prefix = fields.String()
+    number = fields.String()
+    extension = fields.String()
+
+
+class EmailSchema(Schema):
+
+    id = fields.Integer()
+    type = fields.String(attribute='email_type')
+    email = fields.Email()
+
+
 class EntitySchema(Schema):
 
     id = fields.Integer()
     created = fields.DateTime()
     modified = fields.DateTime()
+    address = fields.Nested(AddressSchema, many=True)
+    phone = fields.Nested(PhoneSchema, many=True)
+    email = fields.Nested(EmailSchema, many=True)
+    extra = fields.Nested(ExtraFieldSchema, many=True, attribute='extrafield')
 
 
 class ContactSchema(EntitySchema):
@@ -25,7 +54,13 @@ class SupplierContactSchema(Schema):
     role = fields.String()
 
 
-class SupplierSchema(EntitySchema):
+class FiscalDataSchema(Schema):
+
+    fiscal_type = fields.String(attribute='fiscal_type_str')
+    cuit = fields.String()
+
+
+class SupplierSchema(EntitySchema, FiscalDataSchema):
 
     name = fields.String()
     fancy_name = fields.String()
