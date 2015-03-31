@@ -48,7 +48,7 @@ class FiscalDataMixin(object):
                             default=FISCAL_CONSUMIDOR_FINAL)
 
     @property
-    def display_fiscal_type(self):
+    def fiscal_type_str(self):
         return self._fiscal_types.get(self.fiscal_type, 'Unknown')
     
     @property
@@ -69,13 +69,20 @@ class Address(RefEntityMixin, db.Model):
     postal_code = db.Column(db.Unicode(32))
 
     def __str__(eslf):
-        retval = unicode(self.street)
+        retval = self.street
         if self.city:
             retval += ", {}".format(self.city)
         retval += ", {}".format(self.province)
         if self.postal_code:
             retval += " ({})".format(self.postal_code)
         return retval
+
+    def __repr__(self):
+        return "<Address '{}' of '{}: {}'>".format(
+            str(self),
+            self.entity.entity_type,
+            self.entity.full_name
+        )
 
 
 class Phone(RefEntityMixin, db.Model):
@@ -89,13 +96,20 @@ class Phone(RefEntityMixin, db.Model):
     extension = db.Column(db.Unicode(5))
 
     def __str__(self):
-        retval = unicode(self.phone_type+': ' if self.phone_type else '')
+        retval = self.phone_type+': ' if self.phone_type else ''
         if self.prefix:
             retval += "({})".format(self.prefix)
         retval += self.number
         if self.extension:
             retval += " ext: {}".format(self.extension)
         return retval
+
+    def __repr__(self):
+        return "<Phone '{}' of '{}: {}'>".format(
+            str(self),
+            self.entity.entity_type,
+            self.entity.full_name
+        )
 
 
 class Email(RefEntityMixin, db.Model):
@@ -111,6 +125,13 @@ class Email(RefEntityMixin, db.Model):
         retval += self.email
         return retval
 
+    def __repr__(self):
+        return "<Email '{}' of '{}: {}'>".format(
+            str(self),
+            self.entity.entity_type,
+            self.entity.full_name
+        )
+
 
 class ExtraField(RefEntityMixin, db.Model):
     """Model to store information of additional data"""
@@ -120,4 +141,11 @@ class ExtraField(RefEntityMixin, db.Model):
     field_value = db.Column(db.Unicode(50), nullable=False)
 
     def __str__(self):
-        return self.field_type + ': ' + self.field_value
+        return self.field_name + ': ' + self.field_value
+
+    def __repr__(self):
+        return "<ExtraField '{}' of '{}: {}'>".format(
+            str(self),
+            self.entity.entity_type,
+            self.entity.full_name
+        )
