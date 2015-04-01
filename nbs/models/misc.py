@@ -28,35 +28,6 @@ class RefEntityMixin(object):
                                lazy='joined')
 
 
-class FiscalDataMixin(object):
-
-    FISCAL_CONSUMIDOR_FINAL = u'FISCAL_CONSUMIDOR_FINAL'
-    FISCAL_RESPONSABLE_INSCRIPTO = u'FISCAL_RESPONSABLE_INSCRIPTO'
-    FISCAL_EXCENTO = u'FISCAL_EXCENTO'
-    FISCAL_MONOTRIBUTO = u'FISCAL_MONOTRIBUTO'
-
-    _fiscal_types = {
-        FISCAL_CONSUMIDOR_FINAL: u'Consumidor Final',
-        FISCAL_RESPONSABLE_INSCRIPTO: u'Responsable Inscripto',
-        FISCAL_EXCENTO: u'Excento',
-        FISCAL_MONOTRIBUTO: u'Monotributo',
-    }
-
-    cuit = db.Column(db.Unicode(13))
-    fiscal_type = db.Column(db.Enum(*_fiscal_types.keys(),
-                                    name='fiscal_type_enum'),
-                            default=FISCAL_CONSUMIDOR_FINAL)
-
-    @property
-    def fiscal_type_str(self):
-        return self._fiscal_types.get(self.fiscal_type, 'Unknown')
-    
-    @property
-    def needs_cuit(self):
-        return self.fiscal_type in (self.FISCAL_EXCENTO,
-                                    self.FISCAL_RESPONSABLE_INSCRIPTO)
-
-
 class Address(RefEntityMixin, db.Model):
     """Stores addresses information"""
     __tablename__ = 'address'

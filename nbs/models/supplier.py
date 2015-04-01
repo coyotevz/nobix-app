@@ -4,10 +4,9 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from nbs.models import db
 from nbs.models.entity import Entity
-from nbs.models.misc import FiscalDataMixin
 
 
-class Supplier(Entity, FiscalDataMixin):
+class Supplier(Entity):
     __tablename__ = 'supplier'
     __mapper_args__ = {'polymorphic_identity': u'supplier'}
 
@@ -23,6 +22,11 @@ class Supplier(Entity, FiscalDataMixin):
                             primary_key=True)
     name = Entity._name_1
     fancy_name = Entity._name_2
+
+    fiscal_data_id = db.Column(db.Integer, db.ForeignKey('fiscal_data.id'))
+    fiscal_data = db.relationship('FiscalData',
+                                  cascade='all,delete-orphan',
+                                  backref='supplier')
 
     payment_term = db.Column(db.Integer) # in days
     freight_type = db.Column(db.Enum(*_freight_types.keys(),
@@ -83,6 +87,37 @@ class SupplierContact(db.Model):
             self.role.encode('utf-8'),
             self.contact.full_name.encode('utf-8')
         )
+
+
+class FiscalData(db.Model):
+    __tablename__ = 'fiscal_data'
+
+    FISCAL_CONSUMIDOR_FINAL = u'FISCAL_CONSUMIDOR_FINAL'
+    FISCAL_RESPONSABLE_INSCRIPTO = u'FISCAL_RESPONSABLE_INSCRIPTO'
+    FISCAL_EXCENTO = u'FISCAL_EXCENTO'
+    FISCAL_MONOTRIBUTO = u'FISCAL_MONOTRIBUTO'
+
+    _fiscal_types = {
+        FISCAL_CONSUMIDOR_FINAL: u'Consumidor Final',
+        FISCAL_RESPONSABLE_INSCRIPTO: u'Responsable Inscripto',
+        FISCAL_EXCENTO: u'Excento',
+        FISCAL_MONOTRIBUTO: u'Monotributo',
+    }
+
+    id = db.Column(db.Integer, primary_key=True)
+    cuit = db.Column(db.Unicode(13))
+    fiscal_type = db.Column(db.Enum(*_fiscal_types.keys(),
+                                    name='fiscal_type_enum'),
+                            default=FISCAL_CONSUMIDOR_FINAL)
+
+    @property
+    def fiscal_type_str(self):
+        return self._fiscal_types.get(self.fiscal_type, 'Unknown')
+
+    @property
+    def needs_cuit(self):
+        return self.fiscal_type in (self.FISCAL_EXCENTO,
+                                    self.FISCAL_RESPONSABLE_INSCRIPTO)
 
 
 class Bank(db.Model):
