@@ -9,6 +9,6 @@ def configure_db(app):
 
 
 from nbs.models.supplier import (
-    Supplier, Contact, SupplierContact, Bank, BankAccount
+    Supplier, Contact, SupplierContact, FiscalData, Bank, BankAccount
 )
 from nbs.models.misc import Address, Email, Phone, ExtraField

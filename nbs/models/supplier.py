@@ -25,8 +25,7 @@ class Supplier(Entity):
 
     fiscal_data_id = db.Column(db.Integer, db.ForeignKey('fiscal_data.id'))
     fiscal_data = db.relationship('FiscalData',
-                                  cascade='all,delete-orphan',
-                                  backref='supplier')
+                                  backref=db.backref('supplier', uselist=False))
 
     payment_term = db.Column(db.Integer) # in days
     freight_type = db.Column(db.Enum(*_freight_types.keys(),
@@ -92,16 +91,16 @@ class SupplierContact(db.Model):
 class FiscalData(db.Model):
     __tablename__ = 'fiscal_data'
 
-    FISCAL_CONSUMIDOR_FINAL = u'FISCAL_CONSUMIDOR_FINAL'
-    FISCAL_RESPONSABLE_INSCRIPTO = u'FISCAL_RESPONSABLE_INSCRIPTO'
-    FISCAL_EXCENTO = u'FISCAL_EXCENTO'
-    FISCAL_MONOTRIBUTO = u'FISCAL_MONOTRIBUTO'
+    FISCAL_CONSUMIDOR_FINAL = 'FISCAL_CONSUMIDOR_FINAL'
+    FISCAL_RESPONSABLE_INSCRIPTO = 'FISCAL_RESPONSABLE_INSCRIPTO'
+    FISCAL_EXCENTO = 'FISCAL_EXCENTO'
+    FISCAL_MONOTRIBUTO = 'FISCAL_MONOTRIBUTO'
 
     _fiscal_types = {
-        FISCAL_CONSUMIDOR_FINAL: u'Consumidor Final',
-        FISCAL_RESPONSABLE_INSCRIPTO: u'Responsable Inscripto',
-        FISCAL_EXCENTO: u'Excento',
-        FISCAL_MONOTRIBUTO: u'Monotributo',
+        FISCAL_CONSUMIDOR_FINAL: 'Consumidor Final',
+        FISCAL_RESPONSABLE_INSCRIPTO: 'Responsable Inscripto',
+        FISCAL_EXCENTO: 'Excento',
+        FISCAL_MONOTRIBUTO: 'Monotributo',
     }
 
     id = db.Column(db.Integer, primary_key=True)
@@ -118,6 +117,13 @@ class FiscalData(db.Model):
     def needs_cuit(self):
         return self.fiscal_type in (self.FISCAL_EXCENTO,
                                     self.FISCAL_RESPONSABLE_INSCRIPTO)
+
+    def __repr__(self):
+        return "<FiscaData '{} {}' of '{}'>".format(
+                self.fiscal_type_str,
+                self.cuit,
+                self.supplier.name
+        )
 
 
 class Bank(db.Model):
