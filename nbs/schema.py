@@ -56,14 +56,16 @@ class SupplierContactSchema(Schema):
 
 
 class FiscalDataSchema(Schema):
+    id = fields.Integer()
     fiscal_type = fields.String(attribute='fiscal_type_str')
     cuit = fields.String()
 
 
-class SupplierSchema(EntitySchema, FiscalDataSchema):
+class SupplierSchema(EntitySchema):
     name = fields.String()
     fancy_name = fields.String()
     full_name = fields.String()
+    fiscal_data = fields.Nested(FiscalDataSchema)
     payment_term = fields.Integer(default=None)
     leap_time = fields.Integer(default=None)
     freight_type = fields.String(attribute='freight_type_str')
