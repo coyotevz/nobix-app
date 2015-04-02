@@ -3,7 +3,7 @@
 import locale
 locale.setlocale(locale.LC_ALL, '')
 
-from flask import Flask, request
+from flask import Flask, request, make_response, jsonify
 
 from nbs.models import configure_db
 #from nbs.auth import configure_auth
@@ -51,3 +51,11 @@ def configure_app(app, config=None):
         request.page = int(request.args.get('page', 1))
         request.per_page = min(int(request.args.get('per_page', 25)),
                                max_per_page)
+
+    @app.errorhandler(400)
+    def not_found(error):
+        return make_response(jsonify({'error': 'Not found'}), 400)
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return make_response(jsonify({'error': 'Not found'}), 404)

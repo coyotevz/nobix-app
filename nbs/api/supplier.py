@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, jsonify
+from webargs import Arg, ValidationError
+from webargs.flaskparser import use_args
 from nbs.models import Supplier
 from nbs.schema import SupplierSchema, BankAccountSchema
 
@@ -42,9 +44,16 @@ def get_many(ids):
     return jsonify(objects=result.data)
 
 
+update_args = {
+    'leap_time': Arg(int, allow_missing=True),
+    'payment_term': Arg(int, allow_missing=True),
+}
+
 @supplier_api.route('/<int:id>', methods=['PUT', 'PUSH'])
-def update(id):
-    return jsonify({'action': 'PUT {0}'.format(id)})
+@use_args(update_args)
+def update(args, id):
+    args['action'] = 'PUT {0}'.format(id)
+    return jsonify(args)
 
 
 @supplier_api.route('/<int:id>', methods=['DELETE'])
