@@ -39,7 +39,7 @@ class EntitySchema(Schema):
     phone = fields.Nested(PhoneSchema, many=True, exclude=('entity',))
     email = fields.Nested(EmailSchema, many=True, exclude=('entity',))
     extra = fields.Nested(ExtraFieldSchema, many=True, attribute='extrafield',
-                          exclue=('entity',))
+                          exclude=('entity',))
 
 
 class ContactSchema(EntitySchema):
