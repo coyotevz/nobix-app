@@ -104,9 +104,13 @@ FIELD_MAPPING = {
     fields.Raw: (str, None),
 }
 
-def field2arg(field):
+def field2arg(field, allow_missing=False):
     type_, use = FIELD_MAPPING.get(type(field), (None, None))
     kwargs = {}
+
+    if allow_missing:
+        kwargs['allow_missing'] = True
+
 
     if isinstance(field, fields.Nested):
         type_ = marshmallow2webargs(field.schema)
@@ -115,11 +119,12 @@ def field2arg(field):
     elif isinstance(field, fields.List):
         arg = field2arg(field.container)
         arg.multiple = True
+        arg.allow_missing = allow_missing
         return arg
 
     return Arg(type_, **kwargs)
 
-def marshmallow2webargs(cls_or_instance):
+def marshmallow2webargs(cls_or_instance, allow_missing=False):
     """Return webargs declaration for a given marshmallow 
     :class:`Schema <marshmallow.Schema>`.
     """
@@ -138,7 +143,7 @@ def marshmallow2webargs(cls_or_instance):
 
     keys = set(schema.declared_fields.keys()) - set(schema.exclude)
 
-    args = { field_name: field2arg(schema.declared_fields[field_name]) for\
+    args = { field_name: field2arg(schema.declared_fields[field_name], allow_missing) for\
              field_name in keys }
 
     return args
