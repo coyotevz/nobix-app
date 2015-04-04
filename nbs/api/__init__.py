@@ -2,19 +2,11 @@
 
 from flask import Blueprint, jsonify, url_for
 
-#from nbs.api.user import user_api
+#from nbs.api.user import UserApi
 from nbs.api.supplier import SupplierApi
-from nbs.api.bank_account import bank_account_api
+from nbs.api.bank_account import BankAccountApi
 
 api = Blueprint('api', __name__, url_prefix='/api')
-
-
-def configure_api(app):
-    app.register_blueprint(api)
-    #app.register_blueprint(user_api)
-    SupplierApi.register(app)
-    app.register_blueprint(bank_account_api)
-
 
 @api.route('/')
 def index():
@@ -28,3 +20,10 @@ def documentation():
     return jsonify({
         'message': "Documentation",
     })
+
+
+def configure_api(app):
+    app.register_blueprint(api)
+    #UserApi.register(app)
+    SupplierApi.register(app)
+    BankAccountApi.register(app)

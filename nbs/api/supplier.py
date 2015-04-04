@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, jsonify
+from flask import jsonify
 from webargs import Arg, ValidationError
 from webargs.flaskparser import use_args
 from nbs.models import Supplier
 from nbs.schema import SupplierSchema, BankAccountSchema
-from nbs.utils.api import ResourceApi
+from nbs.utils.api import ResourceApi, route
 
-supplier_api = Blueprint('api.supplier', __name__, url_prefix='/api/suppliers')
-supplier_schema = SupplierSchema()
-suppliers_schema = SupplierSchema(many=True)
-bank_acc_schema = BankAccountSchema(many=True, exclude=('supplier_id', 'supplier_name'))
+s_schema = SupplierSchema()
+ba_schema = BankAccountSchema(many=True, exclude=('supplier_id', 'supplier_name'))
 
+patch_args = {
+    'leap_time': Arg(int, allow_missing=True),
+    'payment_term': Arg(int, allow_missing=True),
+}
 
 class SupplierApi(ResourceApi):
     route_base = 'suppliers'
@@ -21,68 +23,38 @@ class SupplierApi(ResourceApi):
         Returns a paginated list of suppliers that match with the given
         conditions.
         """
-        return jsonify(objects=suppliers_schema.dump(Supplier.query.data))
+        q = Supplier.query
+        return jsonify(objects=s_schema.dump(q, many=True).data)
 
+    @route('/<int:id>')
     def get(self, id):
-        supplier = Supplier.query.get_or_404(int(id))
-        result = supplier_schema.dump(supplier)
-        return jsonify(result.data)
+        """Returns an individual supplier given an id"""
+        supplier = Supplier.query.get_or_404(id)
+        return jsonify(s_schema.dump(supplier).data)
+
+    @route('/<rangelist:ids>')
+    def get_many(self, ids):
+        suppliers = []
+        for id in ids:
+            s = Supplier.query.get(id)
+            if s is not None:
+                suppliers.append(s)
+        return jsonify(objects=s_schema.dump(suppliers, many=True).data)
 
     def post(self):
         return jsonify({'action': 'POST'})
 
-@supplier_api.route('', methods=['GET'])
-def list():
-    """
-    Returns a paginated list of suppliers that match with the given
-    conditions.
-    """
+    @route('/<int:id>')
+    @use_args(patch_args)
+    def patch(self, id):
+        args['action'] = 'PATCH {0}'.format(id)
+        return jsonify(args)
 
-    return jsonify(objects=suppliers_schema.dump(Supplier.query).data)
+    @route('/<int:id>')
+    def delete(self, id):
+        return jsonify({'action': 'DELETE {0}'.format(id)})
 
-
-@supplier_api.route('', methods=['POST'])
-def add():
-    return jsonify({'action': 'POST'})
-
-
-@supplier_api.route('/<int:id>', methods=['GET'])
-def get(id):
-    """Returns an individual supplier given an id"""
-    supplier = Supplier.query.get_or_404(id)
-    result = supplier_schema.dump(supplier)
-    return jsonify(result.data)
-
-@supplier_api.route('/<rangelist:ids>', methods=['GET'])
-def get_many(ids):
-    suppliers = []
-    for id in ids:
-        s = Supplier.query.get(id)
-        if s is not None:
-            suppliers.append(s)
-    result = suppliers_schema.dump(suppliers)
-    return jsonify(objects=result.data)
-
-
-update_args = {
-    'leap_time': Arg(int, allow_missing=True),
-    'payment_term': Arg(int, allow_missing=True),
-}
-
-@supplier_api.route('/<int:id>', methods=['PUT', 'PUSH'])
-@use_args(update_args)
-def update(args, id):
-    args['action'] = 'PUT {0}'.format(id)
-    return jsonify(args)
-
-
-@supplier_api.route('/<int:id>', methods=['DELETE'])
-def delete(id):
-    return jsonify({'action': 'DELETE {0}'.format(id)})
-
-# This is a shortcut, to work with bank accounts use corresponding api
-@supplier_api.route('/<int:id>/accounts', methods=['GET'])
-def get_supplier_accounts(id):
-    supplier = Supplier.query.get(id)
-
-    return jsonify(objects=bank_acc_schema.dump(supplier.bank_accounts).data)
+    @route('<int:id>/accounts')
+    def accounts(self, id):
+        supplier = Supplier.query.get_or_404(id)
+        return jsonify(objects=ba_schema.dump(supplier.bank_accounts).data)

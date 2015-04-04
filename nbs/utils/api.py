@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 
+import re
 from flask.ext.classy import FlaskView, route
 
+
+def uncamel(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 class ResourceApi(FlaskView):
     trailing_slash = False
     endpoint_prefix = 'api'
     route_prefix = '/api'
+    name_suffix = 'Api'
 
     @classmethod
     def build_route_name(cls, method_name):
@@ -19,7 +25,5 @@ class ResourceApi(FlaskView):
 
     @classmethod
     def get_basic_name(cls):
-        if cls.__name__.endswith("Api"):
-            return cls.__name__[:-3].lower()
-        else:
-            return cls.__name__.lower()
+        return uncamel(re.sub('(.)({})'.format(cls.name_suffix),
+                              r'\1', cls.__name__))
