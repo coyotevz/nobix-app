@@ -133,6 +133,9 @@ class Bank(db.Model):
     name = db.Column(db.Unicode)
     # TODO: Add bank logo, to quickly identify
 
+    def __repr__(self):
+        return "<Bank '{}'>".format(self.name)
+
 
 class BankAccount(db.Model):
     __tablename__ = 'bank_account'
@@ -170,3 +173,9 @@ class BankAccount(db.Model):
     @property
     def account_type_str(self):
         return self._account_type[self.account_type]
+
+    def __repr__(self):
+        return "<BankAccount '{}, {}: {}' of '{}'>".format(
+            self.bank.name, self.account_type_str, self.account_number,
+            self.supplier.name
+        )
