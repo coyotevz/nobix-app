@@ -44,15 +44,14 @@ class SupplierApi(ResourceApi):
     def post(self):
         return jsonify({'action': 'POST'})
 
-    @route('/<int:id>')
+    @route('/<int:id>', methods=['PATCH'])
     @use_args(patch_args)
-    def patch(self, id):
-        args['action'] = 'PATCH {0}'.format(id)
+    def patch(self, args, id):
+        args['action'] = 'PATCH {0}'.format(int(id))
         return jsonify(args)
 
-    @route('/<int:id>')
     def delete(self, id):
-        return jsonify({'action': 'DELETE {0}'.format(id)})
+        return jsonify({'action': 'DELETE {0}'.format(int(id))})
 
     @route('<int:id>/accounts')
     def accounts(self, id):
