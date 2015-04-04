@@ -8,7 +8,9 @@ from flask import Flask, request, make_response, jsonify
 from nbs.models import configure_db
 #from nbs.auth import configure_auth
 from nbs.api import configure_api
-from nbs.utils import ListConverter, RangeConverter, RangeListConverter
+from nbs.utils.converters import (
+    ListConverter, RangeConverter, RangeListConverter
+)
 
 
 DEFAULT_APPNAME = 'nobix-app-server'

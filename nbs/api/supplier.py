@@ -5,11 +5,31 @@ from webargs import Arg, ValidationError
 from webargs.flaskparser import use_args
 from nbs.models import Supplier
 from nbs.schema import SupplierSchema, BankAccountSchema
+from nbs.utils.api import ResourceApi
 
 supplier_api = Blueprint('api.supplier', __name__, url_prefix='/api/suppliers')
 supplier_schema = SupplierSchema()
 suppliers_schema = SupplierSchema(many=True)
 bank_acc_schema = BankAccountSchema(many=True, exclude=('supplier_id', 'supplier_name'))
+
+
+class SupplierApi(ResourceApi):
+    route_base = 'suppliers'
+
+    def index(self):
+        """
+        Returns a paginated list of suppliers that match with the given
+        conditions.
+        """
+        return jsonify(objects=suppliers_schema.dump(Supplier.query.data))
+
+    def get(self, id):
+        supplier = Supplier.query.get_or_404(int(id))
+        result = supplier_schema.dump(supplier)
+        return jsonify(result.data)
+
+    def post(self):
+        return jsonify({'action': 'POST'})
 
 @supplier_api.route('', methods=['GET'])
 def list():
