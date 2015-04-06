@@ -47,7 +47,7 @@ class SupplierApi(ResourceApi):
     @route('/<int:id>', methods=['PATCH'])
     @use_args(patch_args)
     def patch(self, args, id):
-        args['action'] = 'PATCH {0}'.format(int(id))
+        args['action'] = 'PATCH {0}'.format(id)
         return jsonify(args)
 
     def delete(self, id):
