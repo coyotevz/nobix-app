@@ -10,10 +10,12 @@ from nbs.utils.args import get_args, build_args
 s_schema = SupplierSchema()
 ba_schema = BankAccountSchema(many=True, exclude=('supplier_id', 'supplier_name'))
 
-patch_args = {
-    'leap_time': Arg(int, allow_missing=True),
-    'payment_term': Arg(int, allow_missing=True),
-}
+writable_schema = SupplierSchema(
+    exclude=('id', 'full_name', 'modified', 'created')
+)
+
+patch_args = build_args(writable_schema, allow_missing=True)
+post_args = build_args(writable_schema)
 
 class SupplierApi(ResourceApi):
     route_base = 'suppliers'
@@ -42,7 +44,9 @@ class SupplierApi(ResourceApi):
         return jsonify(objects=s_schema.dump(suppliers, many=True).data)
 
     def post(self):
-        return jsonify({'action': 'POST'})
+        args = get_args(post_args)
+        args['action'] = 'POST'
+        return jsonify(args)
 
     @route('/<int:id>', methods=['PATCH'])
     def patch(self, id):
