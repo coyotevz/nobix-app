@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from flask import jsonify
+from flask import jsonify, request
 from webargs import Arg, ValidationError
-from webargs.flaskparser import use_args
+from webargs.flaskparser import FlaskParser
 from nbs.models import Supplier
 from nbs.schema import SupplierSchema, BankAccountSchema
 from nbs.utils.api import ResourceApi, route
@@ -14,6 +14,8 @@ patch_args = {
     'leap_time': Arg(int, allow_missing=True),
     'payment_term': Arg(int, allow_missing=True),
 }
+
+parser = FlaskParser()
 
 class SupplierApi(ResourceApi):
     route_base = 'suppliers'
@@ -45,8 +47,8 @@ class SupplierApi(ResourceApi):
         return jsonify({'action': 'POST'})
 
     @route('/<int:id>', methods=['PATCH'])
-    @use_args(patch_args)
-    def patch(self, args, id):
+    def patch(self, id):
+        args = parser.parse(patch_args, request)
         args['action'] = 'PATCH {0}'.format(id)
         return jsonify(args)
 
