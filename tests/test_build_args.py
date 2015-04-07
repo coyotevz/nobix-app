@@ -2,7 +2,7 @@
 
 from webargs import Arg
 from marshmallow import Schema, fields
-from nbs.utils import marshmallow2webargs
+from nbs.utils import build_args
 
 def test_integer_field():
     class TestSchema(Schema):
@@ -12,4 +12,4 @@ def test_integer_field():
         'integer': Arg(int),
     }
 
-    assert test_args == marshmallow2webargs(TestSchema())
+    assert test_args == build_args(TestSchema())

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from flask import request
 from marshmallow import Schema, fields
 from webargs import Arg
+from webargs.flaskparser import FlaskParser
 import warnings
 
 FIELD_MAPPING = {
@@ -33,7 +35,7 @@ def field2arg(field, allow_missing=False):
 
 
     if isinstance(field, fields.Nested):
-        type_ = marshmallow2webargs(field.schema)
+        type_ = build_args(field.schema)
         kwargs['multiple'] = field.many
 
     elif isinstance(field, fields.List):
@@ -44,7 +46,7 @@ def field2arg(field, allow_missing=False):
 
     return Arg(type_, **kwargs)
 
-def marshmallow2webargs(cls_or_instance, allow_missing=False):
+def build_args(cls_or_instance, allow_missing=False):
     """Return webargs declaration for a given marshmallow 
     :class:`Schema <marshmallow.Schema>`.
     """
@@ -67,3 +69,9 @@ def marshmallow2webargs(cls_or_instance, allow_missing=False):
              field_name in keys }
 
     return args
+
+
+_parser = FlaskParser()
+
+def get_args(args):
+    return _parser.parse(args, request)
