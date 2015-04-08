@@ -56,7 +56,10 @@ def configure_app(app, config=None):
                                max_per_page)
 
     def make_json_error(ex):
-        return make_response(jsonify(message=str(ex)),
+        err = {'error': str(ex)}
+        if hasattr(ex, 'data'):
+            err.update(**ex.data)
+        return make_response(jsonify(err),
                              ex.code if isinstance(ex, HTTPException) else 500)
 
     for code in default_exceptions.keys():
