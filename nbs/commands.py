@@ -8,8 +8,7 @@
 
 import sys
 from flask import current_app
-from flask.ext.script import Manager, Shell, prompt_bool
-from flask.ext.script import Command, Option
+from flask.ext.script import Manager, Shell, Command, Option, prompt_bool
 from flask.ext.script.commands import Clean, ShowUrls
 
 from nbs.application import create_app
