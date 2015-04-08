@@ -4,6 +4,7 @@ import locale
 locale.setlocale(locale.LC_ALL, '')
 
 from flask import Flask, request, make_response, jsonify
+from werkzeug.exceptions import default_exceptions, HTTPException
 
 from nbs.models import configure_db
 #from nbs.auth import configure_auth
@@ -54,10 +55,9 @@ def configure_app(app, config=None):
         request.per_page = min(int(request.args.get('per_page', 25)),
                                max_per_page)
 
-    @app.errorhandler(400)
-    def not_found(error):
-        return make_response(jsonify({'error': 'Not found'}), 400)
+    def make_json_error(ex):
+        return make_response(jsonify(message=str(ex)),
+                             ex.code if isinstance(ex, HTTPException) else 500)
 
-    @app.errorhandler(404)
-    def not_found(error):
-        return make_response(jsonify({'error': 'Not found'}), 404)
+    for code in default_exceptions.keys():
+        app.error_handler_spec[None][code] = make_json_error
