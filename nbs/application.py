@@ -55,6 +55,38 @@ def configure_app(app, config=None):
         request.per_page = min(int(request.args.get('per_page', 25)),
                                max_per_page)
 
+    @app.route('/urls')
+    def show_urls():
+        column_headers = ('Rule', 'Endpoint', 'Methods')
+        order = 'rule'
+        rows = []
+        rules = sorted(app.url_map.iter_rules(),
+                       key=lambda rule: getattr(rule, order))
+        for rule in rules:
+            rows.append((rule.rule, rule.endpoint, ', '.join(rule.methods)))
+
+        max_rule_length = max(len(r[0]) for r in rows)
+        max_rule_length = max_rule_length if max_rule_length > 4 else 4
+
+        max_ep_length = max(len(str(r[1])) for r in rows)
+        max_ep_length = max_ep_length if max_ep_length > 8 else 8
+
+        max_meth_length = max(len(str(r[2])) for r in rows)
+        max_meth_length = max_meth_length if max_meth_length > 9 else 9
+
+        str_template = '%-' + str(max_rule_length) + 's' + \
+                       ' %-' + str(max_ep_length) + 's' + \
+                       ' %-' + str(max_meth_length) + 's'
+        table_width = max_rule_length + 2 + max_ep_length + 2 + max_meth_length
+
+        out = str_template % column_headers
+        out += '\n' + '-' * table_width
+        for row in rows:
+            out += '\n' + str_template % row
+        out += '\n'
+
+        return out
+
     def make_json_error(ex):
         err = {'error': str(ex)}
         if hasattr(ex, 'data'):

@@ -8,7 +8,7 @@ from nbs.api.bank_account import BankAccountApi, BankApi
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
-@api.route('/')
+@api.route('')
 def index():
     return jsonify({
         'message': "This is api root.",
@@ -20,7 +20,6 @@ def documentation():
     return jsonify({
         'message': "Documentation",
     })
-
 
 def configure_api(app):
     app.register_blueprint(api)

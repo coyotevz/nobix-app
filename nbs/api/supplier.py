@@ -28,10 +28,9 @@ class SupplierApi(ResourceApi):
         q = Supplier.query
         return jsonify(objects=s_schema.dump(q, many=True).data)
 
-    @route('/<int:id>')
     def get(self, id):
         """Returns an individual supplier given an id"""
-        supplier = Supplier.query.get_or_404(id)
+        supplier = Supplier.query.get_or_404(int(id))
         return jsonify(s_schema.dump(supplier).data)
 
     @route('/<rangelist:ids>')
@@ -48,16 +47,15 @@ class SupplierApi(ResourceApi):
         args['action'] = 'POST'
         return jsonify(args)
 
-    @route('/<int:id>', methods=['PATCH'])
     def patch(self, id):
         args = get_args(patch_args)
-        args['action'] = 'PATCH {0}'.format(id)
+        args['action'] = 'PATCH {0}'.format(int(id))
         return jsonify(args)
 
     def delete(self, id):
         return jsonify({'action': 'DELETE {0}'.format(int(id))})
 
-    @route('<int:id>/accounts')
+    @route('<id>/accounts')
     def accounts(self, id):
-        supplier = Supplier.query.get_or_404(id)
+        supplier = Supplier.query.get_or_404(int(id))
         return jsonify(objects=ba_schema.dump(supplier.bank_accounts).data)
