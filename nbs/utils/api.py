@@ -2,6 +2,7 @@
 
 import re
 import inspect
+from functools import partial
 from flask.ext.classy import FlaskView, route
 
 
@@ -51,6 +52,10 @@ class NestedApi(object):
         self.subpath = subpath
 
     def register(self, attr_name, app, parent):
+        """
+        This is a lazy implementation to register nested api, by the moment
+        this fits well for this project.
+        """
         prefix_parts = []
         route_parts = []
         if parent.route_prefix:
@@ -62,3 +67,9 @@ class NestedApi(object):
         route_parts.append(attr_name)
         self.nested_cls.register(app, route_prefix='/'.join(prefix_parts),
                                  route_base='/'.join(route_parts))
+
+        self.nested_cls.parent = parent
+        self.nested_cls.before_request = self.before_request
+
+    def before_request(self, name, *args, **kwargs):
+        print('before_request:', self.nested_cls, name, args, kwargs)

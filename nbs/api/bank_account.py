@@ -20,16 +20,16 @@ class BankAccountApi(ResourceApi):
         q = BankAccount.query
         return jsonify(objects=ba_schema.dump(q, many=True).data)
 
-    def get(self, id):
-        account = BankAccount.query.get_or_404(int(id))
+    def get(self, acc_id):
+        account = BankAccount.query.get_or_404(int(acc_id))
         return jsonify(ba_schema.dump(account).data)
 
     def post(self):
         args = get_args(self.post_args)
         return jsonify(args)
 
-    def delete(self, id):
-        account = BankAccount.query.get_or_404(int(id))
+    def delete(self, acc_id):
+        account = BankAccount.query.get_or_404(int(acc_id))
         db.session.delete(b)
         db.session.commit()
         return '', 204

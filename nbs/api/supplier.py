@@ -59,10 +59,4 @@ class SupplierApi(ResourceApi):
     def delete(self, id):
         return jsonify({'action': 'DELETE {0}'.format(int(id))})
 
-    test_accounts = NestedApi(BankAccountApi, '<id>')
-
-    @route('<id>/accounts')
-    def accounts(self, id):
-        #supplier = Supplier.query.get_or_404(int(id))
-        supplier = self._get_obj(id)
-        return jsonify(objects=ba_schema.dump(supplier.bank_accounts).data)
+    accounts = NestedApi(BankAccountApi, '<id>')
