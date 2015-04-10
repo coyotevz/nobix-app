@@ -7,10 +7,11 @@ from nbs.utils.api import ResourceApi, route
 from nbs.utils.args import Arg, get_args, build_args, ValidationError
 
 ba_schema = BankAccountSchema()
-post_args = build_args(ba_schema)
 
 class BankAccountApi(ResourceApi):
     route_base = 'bank_accounts'
+
+    post_args = build_args(ba_schema)
 
     def index(self):
         """
@@ -24,7 +25,7 @@ class BankAccountApi(ResourceApi):
         return jsonify(ba_schema.dump(account).data)
 
     def post(self):
-        args = get_args(post_args)
+        args = get_args(self.post_args)
         return jsonify(args)
 
     def delete(self, id):
@@ -39,19 +40,26 @@ def unique_bank_name(val):
     if exists is not None:
         raise ValidationError('Bank name must be unique', status_code=409)
 
-bank_post = {
-    'name': Arg(str, required=True, validate=unique_bank_name),
-}
-
 class BankApi(ResourceApi):
     route_base = 'banks'
+
+    bank_post = {
+        'name': Arg(str, required=True, validate=unique_bank_name),
+    }
 
     def index(self):
         return jsonify(objects=[{'id': b.id, 'name': b.name}
                                 for b in Bank.query.order_by(Bank.name)])
 
+    def put(self, id):
+        b = Bank.query.get_or_404(int(id))
+        args = get_args(self.bank_post)
+        b.name = args['name']
+        db.session.commit()
+        return '', 204
+
     def post(self):
-        args = get_args(bank_post)
+        args = get_args(self.bank_post)
         b = Bank(name=args['name'])
         db.session.add(b)
         db.session.commit()
