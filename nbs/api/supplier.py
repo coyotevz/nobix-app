@@ -4,8 +4,9 @@ from flask import jsonify, request
 from webargs import Arg
 from nbs.models import Supplier
 from nbs.schema import SupplierSchema, BankAccountSchema
-from nbs.utils.api import ResourceApi, route
+from nbs.utils.api import ResourceApi, NestedApi, route
 from nbs.utils.args import get_args, build_args
+from nbs.api.bank_account import BankAccountApi
 
 s_schema = SupplierSchema()
 ba_schema = BankAccountSchema(many=True, exclude=('supplier_id', 'supplier_name'))
@@ -20,6 +21,9 @@ post_args = build_args(writable_schema)
 class SupplierApi(ResourceApi):
     route_base = 'suppliers'
 
+    def _get_obj(self, id):
+        return Supplier.query.get_or_404(int(id))
+
     def index(self):
         """
         Returns a paginated list of suppliers that match with the given
@@ -30,7 +34,7 @@ class SupplierApi(ResourceApi):
 
     def get(self, id):
         """Returns an individual supplier given an id"""
-        supplier = Supplier.query.get_or_404(int(id))
+        supplier = self._get_obj(id)
         return jsonify(s_schema.dump(supplier).data)
 
     @route('/<rangelist:ids>')
@@ -55,7 +59,10 @@ class SupplierApi(ResourceApi):
     def delete(self, id):
         return jsonify({'action': 'DELETE {0}'.format(int(id))})
 
+    test_accounts = NestedApi(BankAccountApi, '<id>')
+
     @route('<id>/accounts')
     def accounts(self, id):
-        supplier = Supplier.query.get_or_404(int(id))
+        #supplier = Supplier.query.get_or_404(int(id))
+        supplier = self._get_obj(id)
         return jsonify(objects=ba_schema.dump(supplier.bank_accounts).data)

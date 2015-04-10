@@ -25,5 +25,5 @@ def configure_api(app):
     app.register_blueprint(api)
     #UserApi.register(app)
     SupplierApi.register(app)
-    BankAccountApi.register(app)
+    #BankAccountApi.register(app)
     BankApi.register(app)
