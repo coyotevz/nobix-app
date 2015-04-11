@@ -65,10 +65,9 @@ class NestedApi(object):
         cls.__name__ = self.nested_cls.__name__
 
         getter = parent.__dict__.get(self.getter, None)
-        if not getter or not isinstance(getter, (classmethod, staticmethod)):
-            raise ValueError("Parent class ({}) must define '{}' and must be "
-                             "classmethod or staticmethod".format(
-                                 parent.__name__, self.getter))
+        if not getter or not isinstance(getter, classmethod):
+            raise ValueError("Parent class ({}) must define '{}' as "
+                             "classmethod".format(parent.__name__, self.getter))
 
         if parent.route_prefix:
             prefix_parts.append(parent.route_prefix)

@@ -25,10 +25,6 @@ class SupplierApi(ResourceApi):
     def get_obj(cls, id):
         return Supplier.query.get_or_404(int(id))
 
-    #@staticmethod
-    #def get_obj(id):
-    #    return Supplier.query.get_or_404(int(id))
-
     def index(self):
         """
         Returns a paginated list of suppliers that match with the given
