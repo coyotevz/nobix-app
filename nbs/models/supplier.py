@@ -130,7 +130,7 @@ class Bank(db.Model):
     __tablename__ = 'bank'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Unicode)
+    name = db.Column(db.Unicode, unique=True)
     # TODO: Add bank logo, to quickly identify
 
     def __repr__(self):
@@ -164,7 +164,7 @@ class BankAccount(db.Model):
     account_owner = db.Column(db.Unicode)
 
 
-    bank_id = db.Column(db.Integer, db.ForeignKey('bank.id'))
+    bank_id = db.Column(db.Integer, db.ForeignKey('bank.id'), nullable=False)
     bank = db.relationship(Bank, backref="accounts")
 
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.supplier_id'))

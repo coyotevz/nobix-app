@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import jsonify, url_for, abort
+from sqlalchemy.exc import IntegrityError
 from nbs.models import db, Bank, BankAccount
 from nbs.schema import BankAccountSchema
 from nbs.utils.api import ResourceApi, route
@@ -77,5 +78,8 @@ class BankApi(ResourceApi):
     def delete(self, id):
         b = Bank.query.get_or_404(int(id))
         db.session.delete(b)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError:
+            abort(409, description='Unable to delete bank')
         return '', 204
