@@ -2,7 +2,6 @@
 
 import re
 import inspect
-from functools import partial
 from flask import request
 from flask.ext.classy import FlaskView, route
 
