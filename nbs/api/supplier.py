@@ -21,8 +21,13 @@ post_args = build_args(writable_schema)
 class SupplierApi(ResourceApi):
     route_base = 'suppliers'
 
-    def _get_obj(self, id):
+    @classmethod
+    def get_obj(cls, id):
         return Supplier.query.get_or_404(int(id))
+
+    #@staticmethod
+    #def get_obj(id):
+    #    return Supplier.query.get_or_404(int(id))
 
     def index(self):
         """
@@ -34,7 +39,7 @@ class SupplierApi(ResourceApi):
 
     def get(self, id):
         """Returns an individual supplier given an id"""
-        supplier = self._get_obj(id)
+        supplier = self.get_obj(id)
         return jsonify(s_schema.dump(supplier).data)
 
     @route('/<rangelist:ids>')
@@ -59,4 +64,4 @@ class SupplierApi(ResourceApi):
     def delete(self, id):
         return jsonify({'action': 'DELETE {0}'.format(int(id))})
 
-    accounts = NestedApi(BankAccountApi, '<id>')
+    accounts = NestedApi(BankAccountApi)

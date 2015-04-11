@@ -3,6 +3,7 @@
 import re
 import inspect
 from functools import partial
+from flask import request
 from flask.ext.classy import FlaskView, route
 
 
@@ -15,6 +16,7 @@ class ResourceApi(FlaskView):
     endpoint_prefix = 'api'
     route_prefix = '/api'
     name_suffix = 'Api'
+    obj = None
 
     @classmethod
     def build_route_name(cls, method_name):
@@ -22,7 +24,8 @@ class ResourceApi(FlaskView):
         if hasattr(cls, 'endpoint_prefix') and cls.endpoint_prefix is not None:
             parts.append(cls.endpoint_prefix)
         parts.append(cls.get_basic_name())
-        parts.append(method_name)
+        if method_name:
+            parts.append(method_name)
         return '.'.join(parts)
 
     @classmethod
@@ -47,9 +50,10 @@ class ResourceApi(FlaskView):
 
 class NestedApi(object):
 
-    def __init__(self, nested_cls, subpath=None):
+    def __init__(self, nested_cls, pk_name='pk', getter='get_obj'):
         self.nested_cls = nested_cls
-        self.subpath = subpath
+        self.pk_name = pk_name
+        self.getter = getter
 
     def register(self, attr_name, app, parent):
         """
@@ -57,19 +61,36 @@ class NestedApi(object):
         this fits well for this project.
         """
         prefix_parts = []
-        route_parts = []
+        class cls(self.nested_cls):
+            pass
+        cls.__name__ = self.nested_cls.__name__
+
+        getter = parent.__dict__.get(self.getter, None)
+        if not getter or not isinstance(getter, (classmethod, staticmethod)):
+            raise ValueError("Parent class ({}) must define '{}' and must be "
+                             "classmethod or staticmethod".format(
+                                 parent.__name__, self.getter))
+
         if parent.route_prefix:
             prefix_parts.append(parent.route_prefix)
         if parent.get_route_base():
             prefix_parts.append(parent.get_route_base())
-        if self.subpath:
-            route_parts.append(self.subpath)
-        route_parts.append(attr_name)
-        self.nested_cls.register(app, route_prefix='/'.join(prefix_parts),
-                                 route_base='/'.join(route_parts))
 
-        self.nested_cls.parent = parent
-        self.nested_cls.before_request = self.before_request
+        route_parts = ['<{}>'.format(self.pk_name), attr_name]
 
-    def before_request(self, name, *args, **kwargs):
-        print('before_request:', self.nested_cls, name, args, kwargs)
+        # change endpoint prefix for registration
+        cls.endpoint_prefix = parent.build_route_name(None)
+
+        cls.register(app, route_prefix='/'.join(prefix_parts),
+                     route_base='/'.join(route_parts))
+
+        def before_request(nested, name, **kwargs):
+            pk = request.view_args.pop(self.pk_name, None)
+            nested.obj = getattr(parent, self.getter)(pk)
+            if hasattr(nested, 'orig_before_request'):
+                return nested.orig_before_request(name, **request.view_args)
+
+        if hasattr(cls, 'before_request'):
+            cls.orig_before_request = cls.before_request
+        cls.before_request = before_request
+        cls.parent = parent

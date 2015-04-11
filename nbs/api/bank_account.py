@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import jsonify, url_for
+from flask import jsonify, url_for, abort
 from nbs.models import db, Bank, BankAccount
 from nbs.schema import BankAccountSchema
 from nbs.utils.api import ResourceApi, route
@@ -18,21 +18,29 @@ class BankAccountApi(ResourceApi):
         Returns a paginated list of bank accounts registered in the system
         """
         q = BankAccount.query
+        if self.obj:
+            q = q.filter(BankAccount.supplier==self.obj)
         return jsonify(objects=ba_schema.dump(q, many=True).data)
 
-    def get(self, acc_id):
-        account = BankAccount.query.get_or_404(int(acc_id))
+    def get(self, id):
+        account = BankAccount.query.get_or_404(int(id))
+        if self.obj:
+            if not account.supplier == self.obj:
+                abort(404)
         return jsonify(ba_schema.dump(account).data)
 
     def post(self):
         args = get_args(self.post_args)
         return jsonify(args)
 
-    def delete(self, acc_id):
-        account = BankAccount.query.get_or_404(int(acc_id))
+    def delete(self, id):
+        account = BankAccount.query.get_or_404(int(id))
         db.session.delete(b)
         db.session.commit()
         return '', 204
+
+    def types(self):
+        return jsonify(**BankAccount._account_type)
 
 
 def unique_bank_name(val):
