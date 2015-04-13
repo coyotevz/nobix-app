@@ -84,5 +84,5 @@ class BankAccountSchema(Schema):
     number = fields.String(attribute='account_number')
     cbu = fields.String(attribute='account_cbu')
     owner = fields.String(attribute='account_owner')
-    supplier_id = fields.String(attribute='supplier.id')
+    supplier_id = fields.Integer(attribute='supplier.id')
     suplpier_name = fields.String(attribute='supplier.name')

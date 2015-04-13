@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, url_for
 
 #from nbs.api.user import UserApi
 from nbs.api.supplier import SupplierApi
-from nbs.api.bank_account import BankAccountApi, BankApi
+from nbs.api.bank_account import BankApi
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
@@ -25,5 +25,4 @@ def configure_api(app):
     app.register_blueprint(api)
     #UserApi.register(app)
     SupplierApi.register(app)
-    BankAccountApi.register(app)
     BankApi.register(app)

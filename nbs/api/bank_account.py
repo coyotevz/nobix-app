@@ -40,9 +40,6 @@ class BankAccountApi(ResourceApi):
         db.session.commit()
         return '', 204
 
-    def types(self):
-        return jsonify(**BankAccount._account_type)
-
 
 def unique_bank_name(val):
     exists = Bank.query.filter(Bank.name==val).first()
@@ -83,3 +80,6 @@ class BankApi(ResourceApi):
         except IntegrityError:
             abort(409, description='Unable to delete bank')
         return '', 204
+
+    def account_types(self):
+        return jsonify(**BankAccount._account_type)
