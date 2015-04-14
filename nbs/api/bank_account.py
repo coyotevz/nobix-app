@@ -8,11 +8,12 @@ from nbs.utils.api import ResourceApi, route
 from nbs.utils.args import Arg, get_args, build_args, ValidationError
 
 ba_schema = BankAccountSchema()
+post_ba_schema = BankAccountSchema(exclude=('bank','supplier_name'))
 
 class BankAccountApi(ResourceApi):
     route_base = 'bank_accounts'
 
-    post_args = build_args(ba_schema)
+    post_args = build_args(post_ba_schema, allow_missing=True)
 
     def index(self):
         """
@@ -34,16 +35,19 @@ class BankAccountApi(ResourceApi):
         args = get_args(self.post_args)
         if self.obj:
             args['supplier_id'] = self.obj.id
-        data, erros = ba_schema.load(args)
+        data, errors = post_ba_schema.load(args)
         ba = BankAccount(**data)
         db.session.add(ba)
-        db.session.commit(ba)
-        return '', 201, {'Link': url_for('api.supplier.bank_account.get', pk=self.obj.id, id=ba.id)}
-        return jsonify(args)
+        db.session.commit()
+        return '', 201, {'Link': url_for('.get', pk=self.obj.id, id=ba.id,
+                                         _external=True)}
 
     def delete(self, id):
         account = BankAccount.query.get_or_404(int(id))
-        db.session.delete(b)
+        if self.obj:
+            if not account.supplier == self.obj:
+                abort(404)
+        db.session.delete(account)
         db.session.commit()
         return '', 204
 
