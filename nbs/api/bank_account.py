@@ -32,6 +32,13 @@ class BankAccountApi(ResourceApi):
 
     def post(self):
         args = get_args(self.post_args)
+        if self.obj:
+            args['supplier_id'] = self.obj.id
+        data, erros = ba_schema.load(args)
+        ba = BankAccount(**data)
+        db.session.add(ba)
+        db.session.commit(ba)
+        return '', 201, {'Link': url_for('api.supplier.bank_account.get', pk=self.obj.id, id=ba.id)}
         return jsonify(args)
 
     def delete(self, id):
