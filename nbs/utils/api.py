@@ -2,7 +2,7 @@
 
 import re
 import inspect
-from flask import request
+from flask import request, jsonify
 from flask.ext.classy import FlaskView, route
 
 
@@ -94,3 +94,13 @@ class NestedApi(object):
             cls.orig_before_request = cls.before_request
         cls.before_request = before_request
         cls.parent = parent
+
+
+def build_result(query, schema):
+    result = query.paginate(request.page, request.per_page)
+    return jsonify({
+        'num_results': result.total,
+        'page': result.page,
+        'num_pages': result.pages,
+        'objects': schema.dump(result.items, many=True).data,
+    })

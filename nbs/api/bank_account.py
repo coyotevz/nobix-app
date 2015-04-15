@@ -3,12 +3,13 @@
 from flask import jsonify, url_for, abort
 from sqlalchemy.exc import IntegrityError
 from nbs.models import db, Bank, BankAccount
-from nbs.schema import BankAccountSchema
-from nbs.utils.api import ResourceApi, route
+from nbs.schema import BankAccountSchema, BankSchema
+from nbs.utils.api import ResourceApi, route, build_result
 from nbs.utils.args import Arg, get_args, build_args, ValidationError
 
 ba_schema = BankAccountSchema()
 post_ba_schema = BankAccountSchema(exclude=('bank','supplier_name'))
+bank_schema = BankSchema()
 
 class BankAccountApi(ResourceApi):
     route_base = 'bank_accounts'
@@ -22,7 +23,7 @@ class BankAccountApi(ResourceApi):
         q = BankAccount.query
         if self.obj:
             q = q.filter(BankAccount.supplier==self.obj)
-        return jsonify(objects=ba_schema.dump(q, many=True).data)
+        return build_result(q, ba_schema)
 
     @route('<int:id>')
     def get(self, id):
@@ -67,8 +68,8 @@ class BankApi(ResourceApi):
     }
 
     def index(self):
-        return jsonify(objects=[{'id': b.id, 'name': b.name}
-                                for b in Bank.query.order_by(Bank.name)])
+        q = Bank.query.order_by(Bank.name)
+        return build_result(q, bank_schema)
 
     @route('<int:id>', methods=['PUT'])
     def put(self, id):

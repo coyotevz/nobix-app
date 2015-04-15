@@ -87,3 +87,7 @@ class BankAccountSchema(Schema):
     owner = fields.String(attribute='account_owner')
     supplier_id = fields.Integer(attribute='supplier_id')
     supplier_name = fields.String(attribute='supplier.name')
+
+class BankSchema(Schema):
+    id = fields.Integer()
+    name = fields.String()

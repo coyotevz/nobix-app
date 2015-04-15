@@ -4,7 +4,7 @@ from flask import jsonify, request
 from webargs import Arg
 from nbs.models import Supplier
 from nbs.schema import SupplierSchema, BankAccountSchema
-from nbs.utils.api import ResourceApi, NestedApi, route
+from nbs.utils.api import ResourceApi, NestedApi, route, build_result
 from nbs.utils.args import get_args, build_args
 from nbs.api.bank_account import BankAccountApi
 
@@ -30,8 +30,7 @@ class SupplierApi(ResourceApi):
         Returns a paginated list of suppliers that match with the given
         conditions.
         """
-        q = Supplier.query
-        return jsonify(objects=s_schema.dump(q, many=True).data)
+        return build_result(Supplier.query, s_schema)
 
     @route('<int:id>')
     def get(self, id):
