@@ -49,9 +49,11 @@ class ResourceApi(FlaskView):
 
 class NestedApi(object):
 
-    def __init__(self, nested_cls, pk_name='pk', getter='get_obj'):
+    def __init__(self, nested_cls, pk_name='pk', pk_converter='any',
+                 getter='get_obj'):
         self.nested_cls = nested_cls
         self.pk_name = pk_name
+        self.pk_converter = pk_converter
         self.getter = getter
 
     def register(self, attr_name, app, parent):
@@ -74,7 +76,7 @@ class NestedApi(object):
         if parent.get_route_base():
             prefix_parts.append(parent.get_route_base())
 
-        route_parts = ['<{}>'.format(self.pk_name), attr_name]
+        route_parts = ['<{}:{}>'.format(self.pk_converter, self.pk_name), attr_name]
 
         # change endpoint prefix for registration
         cls.endpoint_prefix = parent.build_route_name(None)
