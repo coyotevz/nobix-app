@@ -5,6 +5,7 @@ locale.setlocale(locale.LC_ALL, '')
 
 from flask import Flask, request, make_response, jsonify
 from werkzeug.exceptions import default_exceptions, HTTPException
+from webargs.flaskparser import abort
 
 from nbs.models import configure_db
 #from nbs.auth import configure_auth
@@ -51,9 +52,12 @@ def configure_app(app, config=None):
     @app.before_request
     def set_page_params():
         max_per_page = app.config.get('MAX_ITEMS_PER_PAGE', 100)
-        request.page = int(request.args.get('page', 1))
-        request.per_page = min(int(request.args.get('per_page', 25)),
-                               max_per_page)
+        try:
+            request.page = int(request.args.get('page', 1))
+            request.per_page = min(int(request.args.get('per_page', 25)),
+                                   max_per_page)
+        except ValueError as e:
+            abort(400, message='Invalid parameter type')
 
     @app.route('/urls')
     def show_urls():
