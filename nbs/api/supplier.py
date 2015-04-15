@@ -23,7 +23,7 @@ class SupplierApi(ResourceApi):
 
     @classmethod
     def get_obj(cls, id):
-        return Supplier.query.get_or_404(int(id))
+        return Supplier.query.get_or_404(id)
 
     def index(self):
         """
@@ -33,6 +33,7 @@ class SupplierApi(ResourceApi):
         q = Supplier.query
         return jsonify(objects=s_schema.dump(q, many=True).data)
 
+    @route('<int:id>')
     def get(self, id):
         """Returns an individual supplier given an id"""
         supplier = self.get_obj(id)
@@ -52,12 +53,14 @@ class SupplierApi(ResourceApi):
         args['action'] = 'POST'
         return jsonify(args)
 
+    @route('<int:id>', methods=['PATCH'])
     def patch(self, id):
         args = get_args(patch_args)
-        args['action'] = 'PATCH {0}'.format(int(id))
+        args['action'] = 'PATCH {0}'.format(id)
         return jsonify(args)
 
+    @route('<int:id>', methods=['DELETE'])
     def delete(self, id):
-        return jsonify({'action': 'DELETE {0}'.format(int(id))})
+        return jsonify({'action': 'DELETE {0}'.format(id)})
 
-    accounts = NestedApi(BankAccountApi)
+    accounts = NestedApi(BankAccountApi, pk_converter='int')

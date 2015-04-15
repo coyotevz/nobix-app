@@ -24,8 +24,9 @@ class BankAccountApi(ResourceApi):
             q = q.filter(BankAccount.supplier==self.obj)
         return jsonify(objects=ba_schema.dump(q, many=True).data)
 
+    @route('<int:id>')
     def get(self, id):
-        account = BankAccount.query.get_or_404(int(id))
+        account = BankAccount.query.get_or_404(id)
         if self.obj:
             if not account.supplier == self.obj:
                 abort(404)
@@ -42,8 +43,9 @@ class BankAccountApi(ResourceApi):
         return '', 201, {'Link': url_for('.get', pk=self.obj.id, id=ba.id,
                                          _external=True)}
 
+    @route('<int:id>', methods=['DELETE'])
     def delete(self, id):
-        account = BankAccount.query.get_or_404(int(id))
+        account = BankAccount.query.get_or_404(id)
         if self.obj:
             if not account.supplier == self.obj:
                 abort(404)
@@ -68,8 +70,9 @@ class BankApi(ResourceApi):
         return jsonify(objects=[{'id': b.id, 'name': b.name}
                                 for b in Bank.query.order_by(Bank.name)])
 
+    @route('<int:id>', methods=['PUT'])
     def put(self, id):
-        b = Bank.query.get_or_404(int(id))
+        b = Bank.query.get_or_404(id)
         args = get_args(self.bank_post)
         b.name = args['name']
         db.session.commit()
@@ -83,8 +86,9 @@ class BankApi(ResourceApi):
         # Only return id of created Bank, we don't have individual retrieves
         return jsonify({'id': b.id}), 201
 
+    @route('<int:id>', methods=['DELETE'])
     def delete(self, id):
-        b = Bank.query.get_or_404(int(id))
+        b = Bank.query.get_or_404(id)
         db.session.delete(b)
         try:
             db.session.commit()
