@@ -36,7 +36,7 @@ class SupplierApi(ResourceApi):
     def get(self, id):
         """Returns an individual supplier given an id"""
         supplier = self.get_obj(id)
-        return jsonify(s_schema.dump(supplier).data)
+        return build_result(supplier, s_schema)
 
     @route('/<rangelist:ids>')
     def get_many(self, ids):
@@ -45,7 +45,7 @@ class SupplierApi(ResourceApi):
             s = Supplier.query.get(id)
             if s is not None:
                 suppliers.append(s)
-        return jsonify(objects=s_schema.dump(suppliers, many=True).data)
+        return build_result(suppliers, s_schema)
 
     def post(self):
         args = get_args(post_args)

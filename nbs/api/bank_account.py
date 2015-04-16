@@ -31,7 +31,7 @@ class BankAccountApi(ResourceApi):
         if self.obj:
             if not account.supplier == self.obj:
                 abort(404)
-        return jsonify(ba_schema.dump(account).data)
+        return build_result(account, ba_schema)
 
     def post(self):
         args = get_args(self.post_args)
