@@ -9,7 +9,8 @@ from nbs.utils.args import get_args, build_args
 from nbs.api.bank_account import BankAccountApi
 
 s_schema = SupplierSchema()
-ba_schema = BankAccountSchema(many=True, exclude=('supplier_id', 'supplier_name'))
+ba_schema = BankAccountSchema(many=True,
+                              exclude=('supplier_id', 'supplier_name'))
 
 writable_schema = SupplierSchema(
     exclude=('id', 'full_name', 'modified', 'created')

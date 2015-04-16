@@ -25,7 +25,8 @@ class Supplier(Entity):
 
     fiscal_data_id = db.Column(db.Integer, db.ForeignKey('fiscal_data.id'))
     fiscal_data = db.relationship('FiscalData',
-                                  backref=db.backref('supplier', uselist=False))
+                                  backref=db.backref('supplier',
+                                                     uselist=False))
 
     payment_term = db.Column(db.Integer) # in days
     freight_type = db.Column(db.Enum(*_freight_types.keys(),

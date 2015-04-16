@@ -65,8 +65,10 @@ def build_args(cls_or_instance, allow_missing=False):
 
     keys = set(schema.declared_fields.keys()) - set(schema.exclude)
 
-    args = { field_name: field2arg(schema.declared_fields[field_name], allow_missing) for\
-             field_name in keys }
+    args = {
+        field_name: field2arg(schema.declared_fields[field_name],
+                              allow_missing) for field_name in keys
+    }
 
     return args
 

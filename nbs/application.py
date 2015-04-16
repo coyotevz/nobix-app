@@ -52,7 +52,9 @@ def configure_app(app, config=None):
     @app.before_request
     def set_page_params():
         max_per_page = app.config.get('MAX_ITEMS_PER_PAGE', 100)
-        request.select = set(','.join(request.args.getlist('select')).split(','))
+        request.select = set(
+            ','.join(request.args.getlist('select')).split(',')
+        )
         try:
             request.page = int(request.args.get('page', 1))
             request.per_page = min(int(request.args.get('per_page', 25)),

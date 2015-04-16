@@ -70,8 +70,10 @@ class SupplierSchema(EntitySchema):
     leap_time = fields.Integer(default=None)
     freight_type = fields.String(attribute='freight_type_str')
 
-    contacts = fields.Nested(SupplierContactSchema, attribute='supplier_contacts',
+    contacts = fields.Nested(SupplierContactSchema,
+                             attribute='supplier_contacts',
                              many=True, exclude=('supplier',))
+
     bank_accounts = fields.Nested('BankAccountSchema', many=True,
                                   only=('id', 'bank', 'type'))
 
