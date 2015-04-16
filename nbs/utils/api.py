@@ -144,6 +144,6 @@ def build_result(query, schema):
     if is_collection(items):
         out['objects'] = schema.dump(items, many=True).data
     else:
-        out = schema.dump(item, many=False).data
+        out = schema.dump(items, many=False).data
 
     return jsonify(out)
