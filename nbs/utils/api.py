@@ -3,8 +3,30 @@
 import re
 import inspect
 import copy
+from math import ceil
+
 from flask import request, jsonify
 from flask.ext.classy import FlaskView, route
+from marshmallow.utils import is_collection
+
+class Pagination(object):
+
+    def __init__(self, iterable, page, per_page):
+        iterable = list(iterable)
+        self.total = len(iterable)
+        offset = (page-1) * per_page
+        limit = min(offset+per_page, self.total)
+        self.items = iterable[offset:limit]
+        self.page = page
+        self.per_page = per_page
+
+    @property
+    def pages(self):
+        if self.per_page == 0:
+            pages = 0
+        else:
+            pages = int(ceil(self.total / float(self.per_page)))
+        return pages
 
 
 def uncamel(name):
@@ -98,13 +120,30 @@ class NestedApi(object):
 
 
 def build_result(query, schema):
-    s = copy.copy(schema)
-    result = query.paginate(request.page, request.per_page)
+    out = {}
+    if is_collection(query):
+        if hasattr(query, 'paginate') and callable(query.paginate):
+            result = query.paginate(request.page, request.per_page)
+        else:
+            result = Pagination(query, request.page, request.per_page)
+
+        out.update({
+            'num_results': result.total,
+            'page': result.page,
+            'num_pages': result.pages,
+        })
+        items = result.items
+
+    else:
+        items = query
+
     if list(request.select)[0]:
-        s.only = request.select.intersection(s.fields.keys())
-    return jsonify({
-        'num_results': result.total,
-        'page': result.page,
-        'num_pages': result.pages,
-        'objects': s.dump(result.items, many=True).data,
-    })
+        schema = copy.copy(schema)
+        schema.only = request.select.intersection(schema.fields.keys())
+
+    if is_collection(items):
+        out['objects'] = schema.dump(items, many=True).data
+    else:
+        out = schema.dump(item, many=False).data
+
+    return jsonify(out)
