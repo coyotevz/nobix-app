@@ -92,14 +92,17 @@ class NestedApi(object):
         getter = parent.__dict__.get(self.getter, None)
         if not getter or not isinstance(getter, classmethod):
             raise ValueError("Parent class ({}) must define '{}' as "
-                             "classmethod".format(parent.__name__, self.getter))
+                    "classmethod".format(parent.__name__, self.getter))
 
         if parent.route_prefix:
             prefix_parts.append(parent.route_prefix)
         if parent.get_route_base():
             prefix_parts.append(parent.get_route_base())
 
-        route_parts = ['<{}:{}>'.format(self.pk_converter, self.pk_name), attr_name]
+        route_parts = [
+            '<{}:{}>'.format(self.pk_converter, self.pk_name),
+            attr_name,
+        ]
 
         # change endpoint prefix for registration
         cls.endpoint_prefix = parent.build_route_name(None)
