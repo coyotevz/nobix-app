@@ -120,18 +120,18 @@ class NestedApi(object):
 
 
 def build_result(query, schema):
-    out = {}
+
     if is_collection(query):
         if hasattr(query, 'paginate') and callable(query.paginate):
             result = query.paginate(request.page, request.per_page)
         else:
             result = Pagination(query, request.page, request.per_page)
 
-        out.update({
+        out = {
             'num_results': result.total,
             'page': result.page,
             'num_pages': result.pages,
-        })
+        }
         items = result.items
 
     else:
