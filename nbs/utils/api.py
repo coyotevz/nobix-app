@@ -98,6 +98,8 @@ class NestedApi(object):
 
 def build_result(query, schema):
     result = query.paginate(request.page, request.per_page)
+    if list(request.select)[0]:
+        schema.only = request.select.intersection(schema.declared_fields.keys())
     return jsonify({
         'num_results': result.total,
         'page': result.page,
