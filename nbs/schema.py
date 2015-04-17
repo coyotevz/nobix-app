@@ -76,6 +76,8 @@ class SupplierSchema(EntitySchema):
 
     bank_accounts = fields.Nested('BankAccountSchema', many=True,
                                   only=('id', 'bank', 'type'))
+    purchases = fields.Nested('PurchaseDocumentSchema', many=True,
+                              only=('id', 'status', 'amount'))
 
     def make_object(self, data):
         if 'freight_type_str' in data:
@@ -87,11 +89,12 @@ class PurchaseDocumentSchema(Schema):
     id = fields.Integer()
     type = fields.String(attribute='type_str')
     number = fields.String(attribute='number_display')
+    amount = fields.Decimal(places=2, as_string=True)
     issue_date = fields.Date()
     expiration_date = fields.Date()
     status = fields.String(attribute='status_str')
     supplier_id = fields.Integer()
-    suplpier_name = fields.String(attribute='supplier.name')
+    supplier_name = fields.String(attribute='supplier.name')
 
 
 class BankAccountSchema(Schema):
