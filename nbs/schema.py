@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from marshmallow import Schema, fields
+from nbs.models import Supplier
 
 
 class _RefEntitySchema(Schema):
@@ -76,6 +77,11 @@ class SupplierSchema(EntitySchema):
 
     bank_accounts = fields.Nested('BankAccountSchema', many=True,
                                   only=('id', 'bank', 'type'))
+
+    def make_object(self, data):
+        if 'freight_type_str' in data:
+            data['freight_type'] = data.pop('freight_type_str')
+        return Supplier(**data)
 
 
 class BankAccountSchema(Schema):

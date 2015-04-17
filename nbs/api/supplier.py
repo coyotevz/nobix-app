@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from flask import jsonify, request
+from flask import jsonify, request, url_for
 from webargs import Arg
-from nbs.models import Supplier
+from nbs.models import db, Supplier
 from nbs.schema import SupplierSchema, BankAccountSchema
 from nbs.utils.api import ResourceApi, NestedApi, route, build_result
-from nbs.utils.args import get_args, build_args
+from nbs.utils.args import get_args, build_args, Arg, ValidationError
 from nbs.api.bank_account import BankAccountApi
 
 s_schema = SupplierSchema()
@@ -16,8 +16,13 @@ writable_schema = SupplierSchema(
     exclude=('id', 'full_name', 'modified', 'created')
 )
 
-patch_args = build_args(writable_schema, allow_missing=True)
-post_args = build_args(writable_schema)
+def unique_supplier_name(val):
+    exists = Supplier.query.filter(Supplier.name==val).first()
+    if exists is not None:
+        raise ValidationError('Supplier name must be unique', status_code=409)
+
+post_args = build_args(writable_schema, allow_missing=True)
+post_args['name'] = Arg(str, required=True, validate=unique_supplier_name)
 
 class SupplierApi(ResourceApi):
     route_base = 'suppliers'
@@ -50,17 +55,31 @@ class SupplierApi(ResourceApi):
 
     def post(self):
         args = get_args(post_args)
-        args['action'] = 'POST'
-        return jsonify(args)
+        supplier, e = writable_schema.load(args)
+        db.session.add(supplier)
+        db.session.commit()
+        return '', 201, {'Location': url_for('.get', id=supplier.id,
+                                             _external=True)}
+        return build_result(supplier, s_schema), 201
 
     @route('<int:id>', methods=['PATCH'])
     def patch(self, id):
-        args = get_args(patch_args)
-        args['action'] = 'PATCH {0}'.format(id)
-        return jsonify(args)
+        supplier = Supplier.query.get_or_404(id)
+        args = get_args(post_args)
+        print('args:', args)
+        for k, v in args.items():
+            setattr(supplier, k, v)
+        db.session.commit()
+        return '', 204
 
     @route('<int:id>', methods=['DELETE'])
     def delete(self, id):
-        return jsonify({'action': 'DELETE {0}'.format(id)})
+        supplier = Supplier.query.get_or_404(id)
+        db.session.delete(supplier)
+        db.session.commit()
+        return '', 204
+
+    def freight_types(self):
+        return jsonify(**Supplier._freight_types)
 
     accounts = NestedApi(BankAccountApi, pk_converter='int')

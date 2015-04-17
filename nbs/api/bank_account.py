@@ -41,8 +41,8 @@ class BankAccountApi(ResourceApi):
         ba = BankAccount(**data)
         db.session.add(ba)
         db.session.commit()
-        return '', 201, {'Link': url_for('.get', pk=self.obj.id, id=ba.id,
-                                         _external=True)}
+        return '', 201, {'Location': url_for('.get', pk=self.obj.id, id=ba.id,
+                                             _external=True)}
 
     @route('<int:id>', methods=['DELETE'])
     def delete(self, id):
