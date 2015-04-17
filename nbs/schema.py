@@ -64,8 +64,6 @@ class FiscalDataSchema(Schema):
 
 class SupplierSchema(EntitySchema):
     name = fields.String()
-    fancy_name = fields.String()
-    full_name = fields.String()
     fiscal_data = fields.Nested(FiscalDataSchema)
     payment_term = fields.Integer(default=None)
     leap_time = fields.Integer(default=None)

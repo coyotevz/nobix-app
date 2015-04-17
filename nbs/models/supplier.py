@@ -21,7 +21,6 @@ class Supplier(Entity):
     supplier_id = db.Column(db.Integer, db.ForeignKey('entity.id'),
                             primary_key=True)
     name = Entity._name_1
-    fancy_name = Entity._name_2
 
     fiscal_data_id = db.Column(db.Integer, db.ForeignKey('fiscal_data.id'))
     fiscal_data = db.relationship('FiscalData',
@@ -39,11 +38,6 @@ class Supplier(Entity):
     contacts = association_proxy('supplier_contacts', 'contact')
 
     #: 'bank_accounts' field added by BankAccount model
-
-    @property
-    def full_name(self):
-        fn = " ({0})".format(self.fancy_name) if self.fancy_name else u""
-        return "{0}{1}".format(self.name, fn)
 
     @property
     def freight_type_str(self):
