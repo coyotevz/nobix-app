@@ -97,14 +97,15 @@ class PurchaseDocumentSchema(Schema):
 class BankAccountSchema(Schema):
     id = fields.Integer()
     bank = fields.String(attribute='bank.name')
-    bank_id = fields.Integer(attribute='bank_id')
+    bank_id = fields.Integer()
     branch = fields.String(attribute='bank_branch')
     type = fields.String(attribute='account_type_str')
     number = fields.String(attribute='account_number')
     cbu = fields.String(attribute='account_cbu')
     owner = fields.String(attribute='account_owner')
-    supplier_id = fields.Integer(attribute='supplier_id')
+    supplier_id = fields.Integer()
     supplier_name = fields.String(attribute='supplier.name')
+
 
 class BankSchema(Schema):
     id = fields.Integer()
