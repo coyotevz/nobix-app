@@ -49,6 +49,60 @@ class Supplier(Entity):
         self.supplier_contacts.append(SupplierContact(contact, role))
 
 
+class PurchaseDocument(db.Model):
+    __tablename__ = 'purchase_document'
+
+    TYPE_FACTURA_A = 'TYPE_FACTURA_A'
+    TYPE_PRESUPUESTO = 'TYPE_PRESUPUESTO'
+
+    _doc_type = {
+        TYPE_FACTURA_A: 'Factura A',
+        TYPE_PRESUPUESTO: 'Presupuesto',
+    }
+
+    STATUS_PENDING = 'STATUS_PENDING'
+    STATUS_EXPIRED = 'STATUS_EXPIRED'
+    STATUS_PAID = 'STATUS_PAID'
+
+    _doc_status = {
+        STATUS_PENDING: 'Pendiente',
+        STATUS_EXPIRED: 'Vencida',
+        STATUS_PAID: 'Pagada',
+    }
+
+    id = db.Column(db.Integer, primary_key=True)
+    document_type = db.Column(db.Enum(*_doc_type.keys(), name='doc_type'),
+                              default=TYPE_FACTURA_A)
+
+    #: invoice point of sale number
+    pos_no = db.Column(db.Integer)
+    number = db.Column(db.Integer)
+    amount = db.Column(db.Numeric(10, 2), nullable=False)
+    issue_date = db.Column(db.Date)
+    expiration_date = db.Column(db.Date)
+    status = db.Column(db.Enum(*_doc_status.keys(), name='doc_status'),
+                       default=STATUS_PENDING)
+    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'),
+                            nullable=False)
+    supplier = db.relationship(Supplier, backref=db.backref('documents',
+                                                            lazy='dynamic'))
+
+    @property
+    def type_str(self):
+        return self._doc_type[self.document_type]
+
+    @property
+    def status_str(self):
+        return self._doc_status[self.status]
+
+    @property
+    def number_display(self):
+        retval = "%08d" % self.document_number
+        if self.pos_no:
+            retval = "%04d-%s" % (self.pos_no, retval)
+        return retval
+
+
 class Contact(Entity):
     __tablename__ = 'contact'
     __mapper_args__ = {'polymorphic_identity': 'contact'}

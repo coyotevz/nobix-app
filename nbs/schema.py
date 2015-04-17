@@ -83,6 +83,17 @@ class SupplierSchema(EntitySchema):
         return Supplier(**data)
 
 
+class PurchaseDocumentSchema(Schema):
+    id = fields.Integer()
+    type = fields.String(attribute='type_str')
+    number = fields.String(attribute='number_display')
+    issue_date = fields.Date()
+    expiration_date = fields.Date()
+    status = fields.String(attribute='status_str')
+    supplier_id = fields.Integer()
+    suplpier_name = fields.String(attribute='supplier.name')
+
+
 class BankAccountSchema(Schema):
     id = fields.Integer()
     bank = fields.String(attribute='bank.name')
