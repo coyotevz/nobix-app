@@ -27,6 +27,8 @@ class Supplier(Entity):
                                   backref=db.backref('supplier',
                                                      uselist=False))
 
+    #: our number as customer with this supplier
+    customer_no = db.Column(db.Unicode)
     payment_term = db.Column(db.Integer) # in days
     freight_type = db.Column(db.Enum(*_freight_types.keys(),
                              name='freight_type'), default=FREIGHT_CUSTOMER)
