@@ -81,8 +81,8 @@ class SupplierSchema(EntitySchema):
                                   only=('id', 'bank', 'type'))
     purchases = fields.Nested('PurchaseDocumentSchema', many=True,
                               only=('id', 'status', 'expiration', 'amount'))
-    orders = fields.Nested('PurcaseOrderSchema', many=True,
-                              only=('id', 'status', 'issue'))
+    orders = fields.Nested('PurchaseOrderSchema', many=True,
+                           only=('id', 'status', 'issue'))
 
     def make_object(self, data):
         if 'freight_type_str' in data:
