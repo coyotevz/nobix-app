@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from nbs.models import db
+from nbs.models.misc import TimestampMixin
 
 
-class PurchaseDocument(db.Model):
+class PurchaseDocument(db.Model, TimestampMixin):
     __tablename__ = 'purchase_document'
 
     TYPE_FACTURA_A = 'TYPE_FACTURA_A'
@@ -57,7 +58,7 @@ class PurchaseDocument(db.Model):
         return retval
 
 
-class PurchaseOrder(db.Model):
+class PurchaseOrder(db.Model, TimestampMixin):
     __tablename__ = 'purchase_order'
 
     STATUS_CANCELLED = 'STATUS_CANCELLED'
