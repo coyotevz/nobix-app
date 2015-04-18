@@ -8,6 +8,11 @@ class _RefEntitySchema(Schema):
     id = fields.Integer()
     entity = fields.Nested('EntitySchema')
 
+class TimestampSchemaMixin(Schema):
+    created = fields.DateTime()
+    modified = fields.DateTime()
+
+
 class AddressSchema(_RefEntitySchema):
     type = fields.String(attribute='address_type')
     city = fields.String()
@@ -32,10 +37,8 @@ class ExtraFieldSchema(_RefEntitySchema):
     value = fields.String(attribute='field_value')
 
 
-class EntitySchema(Schema):
+class EntitySchema(Schema, TimestampSchemaMixin):
     id = fields.Integer()
-    created = fields.DateTime()
-    modified = fields.DateTime()
     address = fields.Nested(AddressSchema, many=True, exclude=('entity',))
     phone = fields.Nested(PhoneSchema, many=True, exclude=('entity',))
     email = fields.Nested(EmailSchema, many=True, exclude=('entity',))
@@ -77,7 +80,9 @@ class SupplierSchema(EntitySchema):
     bank_accounts = fields.Nested('BankAccountSchema', many=True,
                                   only=('id', 'bank', 'type'))
     purchases = fields.Nested('PurchaseDocumentSchema', many=True,
-                              only=('id', 'status', 'amount'))
+                              only=('id', 'status', 'expiration', 'amount'))
+    orders = fields.Nested('PurcaseOrderSchema', many=True,
+                              only=('id', 'status', 'issue'))
 
     def make_object(self, data):
         if 'freight_type_str' in data:
@@ -85,22 +90,22 @@ class SupplierSchema(EntitySchema):
         return Supplier(**data)
 
 
-class PurchaseDocumentSchema(Schema):
+class PurchaseDocumentSchema(Schema, TimestampSchemaMixin):
     id = fields.Integer()
     type = fields.String(attribute='type_str')
     number = fields.String(attribute='number_display')
     amount = fields.Decimal(places=2, as_string=True)
-    issue_date = fields.Date()
-    expiration_date = fields.Date()
+    issue = fields.Date(attribute='issue_date')
+    expiration = fields.Date(attribute='expiration_date')
     status = fields.String(attribute='status_str')
     supplier_id = fields.Integer()
     supplier_name = fields.String(attribute='supplier.name')
 
 
-class PurchaseOrderSchema(Schema):
+class PurchaseOrderSchema(Schema, TimestampSchemaMixin):
     id = fields.Integer()
     number = fields.Integer()
-    issue_date = fields.DateTime()
+    issue = fields.DateTime(attribute='issue_date')
     notes = fields.String()
     status = fields.String(attribute='status_str')
     notify = fields.String(attribute='notify_str')
