@@ -82,7 +82,7 @@ class PurchaseDocument(db.Model):
     expiration_date = db.Column(db.Date)
     status = db.Column(db.Enum(*_doc_status.keys(), name='doc_status'),
                        default=STATUS_PENDING)
-    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'),
+    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.supplier_id'),
                             nullable=False)
     supplier = db.relationship(Supplier, backref=db.backref('documents',
                                                             lazy='dynamic'))
