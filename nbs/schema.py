@@ -97,6 +97,17 @@ class PurchaseDocumentSchema(Schema):
     supplier_name = fields.String(attribute='supplier.name')
 
 
+class PurchaseOrderSchema(Schema):
+    id = fields.Integer()
+    number = fields.Integer()
+    issue_date = fields.DateTime()
+    notes = fields.String()
+    status = fields.String(attribute='status_str')
+    notify = fields.String(attribute='notify_str')
+    supplier_id = fields.Integer()
+    supplier_name = fields.String(attribute='supplier.name')
+
+
 class BankAccountSchema(Schema):
     id = fields.Integer()
     bank = fields.String(attribute='bank.name')

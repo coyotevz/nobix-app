@@ -103,6 +103,62 @@ class PurchaseDocument(db.Model):
         return retval
 
 
+class PurchaseOrder(db.Model):
+    __tablename__ = 'purchase_order'
+
+    STATUS_CANCELLED = 'STATUS_CANCELLED'
+    STATUS_QUOTING   = 'STATUS_QUOTING'
+    STATUS_PENDING   = 'STATUS_PENDING'
+    STATUS_PARTIAL   = 'STATUS_PARTIAL'
+    STATUS_CONFIRMED = 'STATUS_CONFIRMED'
+    STATUS_CLOSED    = 'STATUS_CLOSED'
+    STATUS_DRAFT     = 'STATUS_DRAFT'
+
+    _order_status = {
+        STATUS_CANCELLED: 'Cancelada',
+        STATUS_QUOTING: 'Presupuestando',
+        STATUS_PENDING: 'Pendiente',
+        STATUS_PARTIAL: 'Parcial',
+        STATUS_CONFIRMED: 'Confirmada',
+        STATUS_CLOSED: 'Cerrada',
+        STATUS_DRAFT: 'Borrador',
+    }
+
+    NOTIFY_EMAIL      = 'NOTIFY_EMAIL'
+    NOTIFY_FAX        = 'NOTIFY_FAX'
+    NOTIFY_PHONE      = 'NOTIFY_PHONE'
+    NOTIFY_PERSONALLY = 'NOTIFY_PERSONALLY'
+
+    _notify = {
+        NOTIFY_EMAIL: 'Correo Electrónico',
+        NOTIFY_FAX: 'Fax',
+        NOTIFY_PHONE: 'Telefónico',
+        NOTIFY_PERSONALLY: 'Personalmente',
+    }
+
+    id = db.Column(db.Integer, primary_key=True)
+    number = db.Column(db.Integer)
+    issue_date = db.Column(db.DateTime)
+    notes = db.Column(db.UnicodeText)
+    status = db.Column(db.Enum(*_order_status.keys(), name='order_status'),
+                       default=STATUS_DRAFT)
+    notify = db.Column(db.Enum(*_notify.keys(), name='notify'),
+                       default=NOTIFY_EMAIL)
+
+    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.supplier_id'))
+    supplier = db.relationship(Supplier,
+                               backref=db.backref('orders', lazy='dynamic'))
+
+    @property
+    def status_str(self):
+        return self._order_status[self.status]
+
+    @property
+    def notify_str(self):
+        return self._notify[self.notify]
+
+
+
 class Contact(Entity):
     __tablename__ = 'contact'
     __mapper_args__ = {'polymorphic_identity': 'contact'}
