@@ -8,7 +8,7 @@ class _RefEntitySchema(Schema):
     id = fields.Integer()
     entity = fields.Nested('EntitySchema')
 
-class TimestampSchemaMixin(Schema):
+class TimestampSchema(Schema):
     created = fields.DateTime()
     modified = fields.DateTime()
 
@@ -37,7 +37,7 @@ class ExtraFieldSchema(_RefEntitySchema):
     value = fields.String(attribute='field_value')
 
 
-class EntitySchema(Schema, TimestampSchemaMixin):
+class EntitySchema(TimestampSchema):
     id = fields.Integer()
     address = fields.Nested(AddressSchema, many=True, exclude=('entity',))
     phone = fields.Nested(PhoneSchema, many=True, exclude=('entity',))
@@ -90,7 +90,7 @@ class SupplierSchema(EntitySchema):
         return Supplier(**data)
 
 
-class PurchaseDocumentSchema(Schema, TimestampSchemaMixin):
+class PurchaseDocumentSchema(TimestampSchema):
     id = fields.Integer()
     type = fields.String(attribute='type_str')
     number = fields.String(attribute='number_display')
@@ -102,7 +102,7 @@ class PurchaseDocumentSchema(Schema, TimestampSchemaMixin):
     supplier_name = fields.String(attribute='supplier.name')
 
 
-class PurchaseOrderSchema(Schema, TimestampSchemaMixin):
+class PurchaseOrderSchema(TimestampSchema):
     id = fields.Integer()
     number = fields.Integer()
     issue = fields.DateTime(attribute='issue_date')
