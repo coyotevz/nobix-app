@@ -40,6 +40,8 @@ class Supplier(Entity):
     contacts = association_proxy('supplier_contacts', 'contact')
 
     #: 'bank_accounts' attribute added by BankAccount.supplier relation
+    #: 'purchases' attribute added by PurchaseDocument.supplier relation
+    #: 'orders' attribute added by PurchaseOrder.supplier relation
 
     @property
     def freight_type_str(self):
