@@ -24,6 +24,8 @@ def unique_supplier_name(val):
 post_args = build_args(writable_schema, allow_missing=True)
 post_args['name'] = Arg(str, required=True, validate=unique_supplier_name)
 
+patch_args = build_args(writable_schema, allow_missing=True)
+
 class SupplierApi(ResourceApi):
     route_base = 'suppliers'
 
@@ -65,7 +67,7 @@ class SupplierApi(ResourceApi):
     @route('<int:id>', methods=['PATCH'])
     def patch(self, id):
         supplier = Supplier.query.get_or_404(id)
-        args = get_args(post_args)
+        args = get_args(patch_args)
         print('args:', args)
         for k, v in args.items():
             setattr(supplier, k, v)
