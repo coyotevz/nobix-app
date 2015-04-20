@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from flask import jsonify, request, url_for
-from webargs import Arg
 from nbs.models import db, Supplier
 from nbs.schema import SupplierSchema, BankAccountSchema
 from nbs.utils.api import ResourceApi, NestedApi, route, build_result
