@@ -112,6 +112,19 @@ class PurchaseOrderSchema(TimestampSchema):
     supplier_id = fields.Integer()
     supplier_name = fields.String(attribute='supplier.name')
 
+    items = fields.Nested('PurchaseOrderItemSchema', many=True,
+                          exclude=('id', 'order_id'))
+
+
+class PurchaseOrderItemSchema(Schema):
+    id = fields.Integer()
+    sku = fields.String()
+    description = fields.String()
+    quantity = fields.Integer()
+    received_quantity = fields.Integer()
+    index = fields.Integer(attribute='order_index')
+    order_id = fields.Integer()
+
 
 class BankAccountSchema(Schema):
     id = fields.Integer()

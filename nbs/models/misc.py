@@ -2,8 +2,6 @@
 
 from datetime import datetime
 
-from sqlalchemy import event
-from sqlalchemy.orm import object_session
 from sqlalchemy.ext.declarative import declared_attr
 
 from nbs.models import db
@@ -17,12 +15,12 @@ class TimestampMixin(object):
 
     @staticmethod
     def stamp_modified(mapper, connection, target):
-        if object_session(target).is_modified(target):
+        if db.object_session(target).is_modified(target):
             target.modified = datetime.now()
 
     @classmethod
     def __declare_last__(cls):
-        event.listen(cls, 'before_update', cls.stamp_modified)
+        db.event.listen(cls, 'before_update', cls.stamp_modified)
 
 
 class RefEntityMixin(object):

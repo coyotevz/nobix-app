@@ -6,6 +6,9 @@ from nbs.models.misc import TimestampMixin
 
 class PurchaseDocument(db.Model, TimestampMixin):
     __tablename__ = 'purchase_document'
+    __table_args__ = (
+        db.UniqueConstraint('pos_no', 'number', 'supplier_id'),
+    )
 
     TYPE_FACTURA_A = 'TYPE_FACTURA_A'
     TYPE_PRESUPUESTO = 'TYPE_PRESUPUESTO'
@@ -30,8 +33,8 @@ class PurchaseDocument(db.Model, TimestampMixin):
                               default=TYPE_FACTURA_A)
 
     #: invoice point of sale number
-    pos_no = db.Column(db.Integer)
-    number = db.Column(db.Integer)
+    pos_no = db.Column(db.Integer, nullable=True)
+    number = db.Column(db.Integer, nullable=True)
     amount = db.Column(db.Numeric(10, 2), nullable=False)
     issue_date = db.Column(db.Date)
     expiration_date = db.Column(db.Date)
@@ -111,3 +114,23 @@ class PurchaseOrder(db.Model, TimestampMixin):
     @property
     def notify_str(self):
         return self._notify[self.notify]
+
+
+class PurchaseOrderItem(db.Model):
+    __tablename__ = 'purchase_orderitem'
+    __table_args__ = (
+        db.UniqueConstraint('order_index', 'order_id'),
+        db.UniqueConstraint('sku', 'order_id'),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    sku = db.Column(db.Unicode) # codigo producto
+    description = db.Column(db.Unicode)
+    quantity = db.Column(db.Integer)
+    received_quantity = db.Column(db.Integer, default=0)
+
+    order_index = db.Column(db.Integer, nullable=False)
+
+    order_id = db.Column(db.Integer, db.ForeignKey('purchase_order.id'),
+                         nullable=False)
+    order = db.relationship(PurchaseOrder, backref='items')
