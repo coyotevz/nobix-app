@@ -43,6 +43,12 @@ class Supplier(Entity):
     #: 'purchases' attribute added by PurchaseDocument.supplier relation
     #: 'orders' attribute added by PurchaseOrder.supplier relation
 
+    #: Inherited from Entity
+    #:  - address    (collection)
+    #:  - phone      (collection)
+    #:  - email      (collection)
+    #:  - extrafield (collection)
+
     @property
     def freight_type_str(self):
         return self._freight_types[self.freight_type]
