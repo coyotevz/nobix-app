@@ -143,7 +143,7 @@ class PurchaseOrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sku = db.Column(db.Unicode) # codigo producto
     description = db.Column(db.Unicode)
-    quantity = db.Column(db.Integer)
+    quantity = db.Column(db.Integer, nullable=False)
     received_quantity = db.Column(db.Integer, default=0)
 
     order_index = db.Column(db.Integer, nullable=False)
