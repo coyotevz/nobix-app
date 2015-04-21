@@ -12,5 +12,7 @@ from nbs.models.supplier import Supplier
 from nbs.models.contact import Contact, SupplierContact
 from nbs.models.fiscal import FiscalData
 from nbs.models.bank import Bank, BankAccount
-from nbs.models.document import PurchaseDocument, PurchaseOrder
+from nbs.models.document import (
+    PurchaseDocument, PurchaseOrder, PurchaseOrderItem
+)
 from nbs.models.misc import Address, Email, Phone, ExtraField
