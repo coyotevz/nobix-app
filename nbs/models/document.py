@@ -107,6 +107,23 @@ class PurchaseOrder(db.Model, TimestampMixin):
     supplier = db.relationship('Supplier',
                                backref=db.backref('orders', lazy='dynamic'))
 
+    def add_item(self, item, position=None):
+        assert isinstance(item, PurchaseOrderItem)
+        if position is not None and position <= self.items.count():
+            position = max(position, 1)
+            self.reindex_items(position, 1)
+            item.order_index = position
+        else:
+            item.order_index = self.items.count() + 1
+        self.items.append(item)
+
+    def reindex_items(self, start=1, shift=0):
+        items = self.items.filter(PurchaseOrderItem.order_index>=start).all()
+        for idx, item in reversed(list(enumerate(items, start=(start+shift)))):
+            # This modifies unique key so do in subtransactions
+            with db.session.begin(subtransactions=True):
+                item.order_index = idx
+
     @property
     def status_str(self):
         return self._order_status[self.status]
@@ -133,4 +150,10 @@ class PurchaseOrderItem(db.Model):
 
     order_id = db.Column(db.Integer, db.ForeignKey('purchase_order.id'),
                          nullable=False)
-    order = db.relationship(PurchaseOrder, backref='items')
+    order = db.relationship(PurchaseOrder,
+                            backref=db.backref('items', lazy='dynamic',
+                                               order_by=order_index))
+    def __repr__(self):
+        return "<PurchaseOrderItem {} '{} {} * {}' of PO{}>".format(
+                self.order_index, self.sku, self.description, self.quantity
+                self.order.number)
