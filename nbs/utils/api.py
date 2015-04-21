@@ -140,9 +140,13 @@ def build_result(query, schema):
     else:
         items = query
 
-    if list(request.select)[0]:
+    if request.select or request.omit:
         schema = copy.copy(schema)
-        schema.only = request.select.intersection(schema.fields.keys())
+        if list(request.select)[0]:
+            schema.only = request.select.intersection(schema.fields.keys())
+        if list(request.omit)[0]:
+            only_set = set(schema.only or schema.fields.keys())
+            schema.only = only_set.difference(request.omit)
 
     if is_collection(items):
         out['objects'] = schema.dump(items, many=True).data

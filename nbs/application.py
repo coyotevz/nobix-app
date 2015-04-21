@@ -55,6 +55,9 @@ def configure_app(app, config=None):
         request.select = set(
             ','.join(request.args.getlist('select')).split(',')
         )
+        request.omit = set(
+            ','.join(request.args.getlist('omit')).split(',')
+        )
         try:
             request.page = int(request.args.get('page', 1))
             request.per_page = min(int(request.args.get('per_page', 25)),
