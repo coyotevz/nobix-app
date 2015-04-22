@@ -24,7 +24,8 @@ post_args = build_args(writable_schema, allow_missing=True)
 post_args['name'] = Arg(str, required=True, validate=unique_supplier_name)
 
 patch_args = build_args(writable_schema, allow_missing=True)
-patch_args['name'] = Arg(str, validate=unique_supplier_name)
+patch_args['name'] = Arg(str, validate=unique_supplier_name,
+                         allow_missing=True)
 
 class SupplierApi(ResourceApi):
     route_base = 'suppliers'
@@ -68,7 +69,6 @@ class SupplierApi(ResourceApi):
     def patch(self, id):
         supplier = self.get_obj(id)
         args = get_args(patch_args)
-        print('args:', args)
         for k, v in args.items():
             setattr(supplier, k, v)
         db.session.commit()
