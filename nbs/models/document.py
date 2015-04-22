@@ -155,5 +155,5 @@ class PurchaseOrderItem(db.Model):
                                                order_by=order_index))
     def __repr__(self):
         return "<PurchaseOrderItem {} '{} {} * {}' of PO{}>".format(
-                self.order_index, self.sku, self.description, self.quantity
+                self.order_index, self.sku, self.description, self.quantity,
                 self.order.number)
