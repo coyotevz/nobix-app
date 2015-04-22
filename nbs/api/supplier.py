@@ -65,7 +65,7 @@ class SupplierApi(ResourceApi):
 
     @route('<int:id>', methods=['PATCH'])
     def patch(self, id):
-        supplier = Supplier.query.get_or_404(id)
+        supplier = self.get_obj(id)
         args = get_args(patch_args)
         print('args:', args)
         for k, v in args.items():
@@ -75,7 +75,7 @@ class SupplierApi(ResourceApi):
 
     @route('<int:id>', methods=['DELETE'])
     def delete(self, id):
-        supplier = Supplier.query.get_or_404(id)
+        supplier = self.get_obj(id)
         db.session.delete(supplier)
         db.session.commit()
         return '', 204
