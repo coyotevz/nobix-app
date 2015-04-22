@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from marshmallow import Schema, fields
-from nbs.models import Supplier
+from nbs.models import Supplier, Employee
 
 
 class _RefEntitySchema(Schema):
@@ -62,12 +62,15 @@ class SupplierContactSchema(Schema):
 class FiscalDataSchema(Schema):
     id = fields.Integer()
     fiscal_type = fields.String(attribute='fiscal_type_str')
-    cuit = fields.Method('format_cuit')
+    cuit = fields.Method('serialize_cuit', 'deserialize_cuit')
 
 
-    def format_cuit(self, obj):
+    def serialize_cuit(self, obj):
         c = obj.cuit
         return "{}-{}-{}".format(c[:2], c[2:10], c[10:])
+
+    def deserialize_cuit(self, val):
+        return val.replace("-", "")
 
 
 class SupplierSchema(EntitySchema):
@@ -154,18 +157,22 @@ class EmployeeSchema(EntitySchema):
     last_name = fields.String()
     birth_date = fields.Date()
     hire_date = fields.Date()
-    cuil = fields.Method('format_cuil')
+    cuil = fields.Method('serialize_cuil', 'deserialize_cuil')
     file_no = fields.Integer()
     user_code = fields.Integer()
 
-    def format_cuil(self, obj):
+    def serialize_cuil(self, obj):
         c = obj.cuil
         return "{}-{}-{}".format(c[:2], c[2:10], c[10:])
 
+    def deserialize_cuil(self, val):
+        return val.replace("-", "")
+
+    def make_object(self, data):
+        return Employee(**data)
+
 
 class AttendanceRecordSchema(Schema):
-    id = fields.Integer()
-    user_code = fields.Integer()
     datetime = fields.DateTime()
     bkp_type = fields.Integer()
     type_code = fields.Integer()

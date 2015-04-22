@@ -34,8 +34,8 @@ class Employee(Entity):
     birth_date = db.Column(db.Date, nullable=False)
     hire_date = db.Column(db.Date, nullable=False)
     cuil = db.Column(db.Unicode, nullable=False)
-    user_code = db.Column(db.Integer)
-    file_no = db.Column(db.Integer)
+    user_code = db.Column(db.Integer, unique=True)
+    file_no = db.Column(db.Integer, unique=True)
 
     records = db.relationship(
         AttendanceRecord,
