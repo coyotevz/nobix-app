@@ -156,6 +156,7 @@ class EmployeeSchema(EntitySchema):
     hire_date = fields.Date()
     cuil = fields.Method('format_cuil')
     file_no = fields.Integer()
+    user_code = fields.Integer()
 
     def format_cuil(self, obj):
         c = obj.cuil
