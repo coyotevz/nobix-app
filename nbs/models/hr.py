@@ -40,7 +40,7 @@ class Employee(Entity):
     records = db.relationship(
         AttendanceRecord,
         primaryjoin=user_code == db.foreign(AttendanceRecord.user_code),
-        backref='employee', lazy='dynamic'
+        backref='employee', lazy='dynamic', cascade='all, delete-orphan'
     )
 
     @property
