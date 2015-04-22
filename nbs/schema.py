@@ -62,7 +62,12 @@ class SupplierContactSchema(Schema):
 class FiscalDataSchema(Schema):
     id = fields.Integer()
     fiscal_type = fields.String(attribute='fiscal_type_str')
-    cuit = fields.String()
+    cuit = fields.Method('format_cuit')
+
+
+    def format_cuit(self, obj):
+        c = obj.cuit
+        return "{}-{}-{}".format(c[:2], c[2:10], c[10:])
 
 
 class SupplierSchema(EntitySchema):
@@ -142,3 +147,24 @@ class BankAccountSchema(Schema):
 class BankSchema(Schema):
     id = fields.Integer()
     name = fields.String()
+
+
+class EmployeeSchema(EntitySchema):
+    first_name = fields.String()
+    last_name = fields.String()
+    birth_date = fields.Date()
+    hire_date = fields.Date()
+    cuil = fields.Method('format_cuil')
+    file_no = fields.Integer()
+
+    def format_cuil(self, obj):
+        c = obj.cuil
+        return "{}-{}-{}".format(c[:2], c[2:10], c[10:])
+
+
+class AttendanceRecordSchema(Schema):
+    id = fields.Integer()
+    user_code = fields.Integer()
+    datetime = fields.DateTime()
+    bkp_type = fields.Integer()
+    type_code = fields.Integer()
