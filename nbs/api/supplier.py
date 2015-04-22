@@ -24,6 +24,7 @@ post_args = build_args(writable_schema, allow_missing=True)
 post_args['name'] = Arg(str, required=True, validate=unique_supplier_name)
 
 patch_args = build_args(writable_schema, allow_missing=True)
+patch_args['name'] = Arg(str, validate=unique_supplier_name)
 
 class SupplierApi(ResourceApi):
     route_base = 'suppliers'
