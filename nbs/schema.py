@@ -172,7 +172,12 @@ class EmployeeSchema(EntitySchema):
         return Employee(**data)
 
 
+class IntervalInfoSchema(Schema):
+    input = fields.Time()
+    output = fields.Time()
+    late = fields.TimeDelta()
+
+
 class AttendanceRecordSchema(Schema):
-    datetime = fields.DateTime()
-    bkp_type = fields.Integer()
-    type_code = fields.Integer()
+    day = fields.Date()
+    intervals = fields.Nested(IntervalInfoSchema, many=True)

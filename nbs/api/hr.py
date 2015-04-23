@@ -5,6 +5,7 @@ from nbs.models import db, Employee, AttendanceRecord
 from nbs.schema import EmployeeSchema, AttendanceRecordSchema
 from nbs.utils.api import ResourceApi, NestedApi, route, build_result
 from nbs.utils.args import get_args, build_args, Arg, ValidationError
+from nbs.utils.attendance import fixed_records
 
 employee_s = EmployeeSchema()
 writable_schema = EmployeeSchema(
@@ -77,4 +78,4 @@ class EmployeeApi(ResourceApi):
     def get_records(self, id, year, month):
         employee = self.get_obj(id)
         records = employee.month_records(year, month)
-        return build_result(records, ar_schema)
+        return build_result(fixed_records(records, year, month), ar_schema)
