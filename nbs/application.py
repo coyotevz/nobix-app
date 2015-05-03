@@ -65,6 +65,18 @@ def configure_app(app, config=None):
         except ValueError as e:
             abort(400, message='Invalid parameter type')
 
+    @app.after_request
+    def add_cors_headers(response):
+        if 'Origin' in request.headers:
+
+            a = response.headers.add
+            a('Access-Control-Allow-Origin', request.headers['Origin'])
+            a('Access-Control-Allow-Credentials', 'true')
+            a('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+            a('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+        return response
+
+
     @app.route('/urls')
     def show_urls():
         column_headers = ('Rule', 'Endpoint', 'Methods')
