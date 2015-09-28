@@ -7,6 +7,7 @@ from nbs.api.supplier import SupplierApi
 from nbs.api.hr import EmployeeApi
 from nbs.api.bank_account import BankApi
 from nbs.api.purchase_order import PurchaseOrderApi
+from nbs.api.product import ProductApi
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
@@ -30,3 +31,4 @@ def configure_api(app):
     EmployeeApi.register(app)
     BankApi.register(app)
     PurchaseOrderApi.register(app)
+    ProductApi.register(app)

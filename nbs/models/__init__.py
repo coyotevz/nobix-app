@@ -17,3 +17,5 @@ from nbs.models.document import (
     PurchaseDocument, PurchaseOrder, PurchaseOrderItem
 )
 from nbs.models.misc import Address, Email, Phone, ExtraField
+
+from nbs.models.product import Product

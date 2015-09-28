@@ -134,6 +134,14 @@ class PurchaseOrderItemSchema(Schema):
     order_id = fields.Integer()
 
 
+class ProductSchema(TimestampSchema):
+    id = fields.Integer()
+    sku = fields.String()
+    description = fields.String()
+    notes = fields.String()
+    price = fields.Decimal(places=2, as_string=True)
+
+
 class BankAccountSchema(Schema):
     id = fields.Integer()
     bank = fields.String(attribute='bank.name')
