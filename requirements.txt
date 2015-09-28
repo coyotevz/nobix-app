@@ -2,6 +2,7 @@ Flask
 Flask-Script
 Flask-SQLAlchemy
 Flask-Classy
+psycopg2
 webargs
 marshmallow
 python-dateutil
