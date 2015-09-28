@@ -4,7 +4,7 @@ from flask import jsonify, request, url_for
 from nbs.models import db, Employee, AttendanceRecord
 from nbs.schema import EmployeeSchema, AttendanceRecordSchema
 from nbs.utils.api import ResourceApi, NestedApi, route, build_result
-from nbs.utils.args import get_args, build_args, Arg, ValidationError
+from nbs.utils.args import get_args, build_args, fields, ValidationError
 from nbs.utils.attendance import fixed_records
 
 employee_s = EmployeeSchema()
@@ -27,13 +27,13 @@ def unique_user_code(val):
                               status_code=409)
 
 post_args = build_args(writable_schema, allow_missing=True)
-post_args['file_no'] = Arg(int, required=True, validate=unique_file_no)
-post_args['user_code'] = Arg(int, required=True, validate=unique_user_code)
+post_args['file_no'] = fields.Integer(required=True, validate=unique_file_no)
+post_args['user_code'] = fields.Integer(required=True, validate=unique_user_code)
 
 patch_args = build_args(writable_schema, allow_missing=True)
-patch_args['file_no'] = Arg(int, validate=unique_file_no, allow_missing=True)
-patch_args['user_code'] = Arg(int, validate=unique_user_code,
-                              allow_missing=True)
+patch_args['file_no'] = fields.Integer(validate=unique_file_no, allow_missing=True)
+patch_args['user_code'] = fields.Integer(validate=unique_user_code,
+                                         allow_missing=True)
 
 class EmployeeApi(ResourceApi):
     route_base = 'employees'

@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from nbs.models import db, Bank, BankAccount
 from nbs.schema import BankAccountSchema, BankSchema
 from nbs.utils.api import ResourceApi, route, build_result
-from nbs.utils.args import Arg, get_args, build_args, ValidationError
+from nbs.utils.args import fields, get_args, build_args, ValidationError
 
 ba_schema = BankAccountSchema()
 post_ba_schema = BankAccountSchema(exclude=('bank','supplier_name'))
@@ -64,7 +64,7 @@ class BankApi(ResourceApi):
     route_base = 'banks'
 
     bank_post = {
-        'name': Arg(str, required=True, validate=unique_bank_name),
+        'name': fields.String(required=True, validate=unique_bank_name),
     }
 
     def index(self):

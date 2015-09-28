@@ -4,7 +4,7 @@ from flask import jsonify, request, url_for
 from nbs.models import db, Supplier
 from nbs.schema import SupplierSchema, BankAccountSchema
 from nbs.utils.api import ResourceApi, NestedApi, route, build_result
-from nbs.utils.args import get_args, build_args, Arg, ValidationError
+from nbs.utils.args import get_args, build_args, fields, ValidationError
 from nbs.api.bank_account import BankAccountApi
 
 s_schema = SupplierSchema()
@@ -21,11 +21,11 @@ def unique_supplier_name(val):
         raise ValidationError('Supplier name must be unique', status_code=409)
 
 post_args = build_args(writable_schema, allow_missing=True)
-post_args['name'] = Arg(str, required=True, validate=unique_supplier_name)
+post_args['name'] = fields.String(required=True, validate=unique_supplier_name)
 
 patch_args = build_args(writable_schema, allow_missing=True)
-patch_args['name'] = Arg(str, validate=unique_supplier_name,
-                         allow_missing=True)
+patch_args['name'] = fields.String(validate=unique_supplier_name,
+                                   allow_missing=True)
 
 class SupplierApi(ResourceApi):
     route_base = 'suppliers'

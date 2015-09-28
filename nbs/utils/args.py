@@ -2,7 +2,8 @@
 
 from flask import request
 from marshmallow import Schema, fields
-from webargs.core import Arg, ValidationError, text_type as _text_type
+from marshmallow.compat import text_type as _text_type
+from webargs import ValidationError
 from webargs.flaskparser import FlaskParser, abort as _abort
 import warnings
 
@@ -11,7 +12,6 @@ FIELD_MAPPING = {
     fields.Integer: (int, None),
     fields.Number: (int, None),
     fields.Float: (float, None),
-    fields.Fixed: (float, None),
     fields.Decimal: (int, None),
     fields.String: (str, None),
     fields.Boolean: (bool, None),
@@ -65,10 +65,7 @@ def build_args(cls_or_instance, allow_missing=False):
 
     keys = set(schema.declared_fields.keys()) - set(schema.exclude)
 
-    args = {
-        field_name: field2arg(schema.declared_fields[field_name],
-                              allow_missing) for field_name in keys
-    }
+    args = { fname: schema.declared_fields[fname] for fname in keys }
 
     return args
 
