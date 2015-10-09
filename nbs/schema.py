@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from marshmallow import Schema, fields
-from nbs.models import Supplier, Employee
+from nbs.models import Employee
 
 
 class _RefEntitySchema(Schema):
@@ -71,31 +71,6 @@ class FiscalDataSchema(Schema):
 
     def deserialize_cuit(self, val):
         return val.replace("-", "")
-
-
-class SupplierSchema(EntitySchema):
-    name = fields.String()
-    fiscal_data = fields.Nested(FiscalDataSchema, allow_null=True)
-    customer_no = fields.String(default=None)
-    payment_term = fields.Integer(default=None)
-    leap_time = fields.Integer(default=None)
-    freight_type = fields.String(attribute='freight_type_str')
-
-    contacts = fields.Nested(SupplierContactSchema,
-                             attribute='supplier_contacts',
-                             many=True, exclude=('supplier',))
-
-    bank_accounts = fields.Nested('BankAccountSchema', many=True,
-                                  only=('id', 'bank', 'type'))
-    purchases = fields.Nested('PurchaseDocumentSchema', many=True,
-                              only=('id', 'status', 'expiration', 'amount'))
-    orders = fields.Nested('PurchaseOrderSchema', many=True,
-                           only=('id', 'status', 'issue'))
-
-    def make_object(self, data):
-        if 'freight_type_str' in data:
-            data['freight_type'] = data.pop('freight_type_str')
-        return Supplier(**data)
 
 
 class PurchaseDocumentSchema(TimestampSchema):
