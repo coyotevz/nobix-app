@@ -148,6 +148,9 @@ def build_result(query, schema):
             only_set = set(schema.only or schema.fields.keys())
             schema.only = only_set.difference(request.omit)
 
+        if schema.only:
+            schema.only.add('id')
+
     if is_collection(items):
         out['objects'] = schema.dump(items, many=True).data
     else:
