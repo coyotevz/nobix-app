@@ -72,14 +72,5 @@ def build_args(cls_or_instance, allow_missing=False):
 
 _parser = FlaskParser()
 
-@_parser.error_handler
-def _handle_error(error):
-    """Handles error during parsing. Aborts the current HTTP request and
-    responds with a 400 error.
-    """
-    status_code = getattr(error, 'status_code', 400)
-    data = getattr(error, 'data', {})
-    _abort(status_code, message=_text_type(error), **data)
-
 def get_args(args):
     return _parser.parse(args, request)

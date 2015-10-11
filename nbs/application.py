@@ -104,8 +104,8 @@ def configure_app(app, config=None):
 
     def make_json_error(ex):
         err = {'error': str(ex)}
-        if hasattr(ex, 'data'):
-            err.update(**ex.data)
+        if hasattr(ex, 'data') and 'messages' in ex.data:
+            err.update({'messages': ex.data['messages']})
         return make_response(jsonify(err),
                              ex.code if isinstance(ex, HTTPException) else 500)
 
