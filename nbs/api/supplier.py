@@ -43,7 +43,6 @@ ba_schema = BankAccountSchema(many=True,
                               exclude=('supplier_id', 'supplier_name'))
 
 writable_schema = SupplierSchema(
-    exclude=('id', 'modified', 'created'),
     strict=True,
 )
 

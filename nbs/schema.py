@@ -9,8 +9,8 @@ class _RefEntitySchema(Schema):
     entity = fields.Nested('EntitySchema')
 
 class TimestampSchema(Schema):
-    created = fields.DateTime()
-    modified = fields.DateTime()
+    created = fields.DateTime(dump_only=True)
+    modified = fields.DateTime(dump_only=True)
 
 
 class AddressSchema(_RefEntitySchema):
@@ -38,7 +38,7 @@ class ExtraFieldSchema(_RefEntitySchema):
 
 
 class EntitySchema(TimestampSchema):
-    id = fields.Integer()
+    id = fields.Integer(dump_only=True)
     address = fields.Nested(AddressSchema, many=True, exclude=('entity',))
     phone = fields.Nested(PhoneSchema, many=True, exclude=('entity',))
     email = fields.Nested(EmailSchema, many=True, exclude=('entity',))
