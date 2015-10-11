@@ -15,7 +15,7 @@ def unique_supplier_name(val):
 
 
 class SupplierSchema(EntitySchema):
-    name = fields.String(required=True, validate=unique_supplier_name)
+    name = fields.String(validate=unique_supplier_name)
     fiscal_data = fields.Nested('FiscalDataSchema', allow_null=True)
     customer_no = fields.String(default=None)
     payment_term = fields.Integer(default=None)
@@ -38,13 +38,15 @@ class SupplierSchema(EntitySchema):
             data['freight_type'] = data.pop('freight_type_str')
         return Supplier(**data)
 
-s_schema = SupplierSchema()
+s_schema = SupplierSchema(strict=True)
 ba_schema = BankAccountSchema(many=True,
                               exclude=('supplier_id', 'supplier_name'))
 
 writable_schema = SupplierSchema(
     strict=True,
 )
+
+writable_schema.fields['name'].required = True
 
 #post_args = build_args(writable_schema, allow_missing=True)
 #post_args['name'] = fields.String(required=True, validate=unique_supplier_name)
@@ -94,7 +96,7 @@ class SupplierApi(ResourceApi):
     @route('<int:id>', methods=['PATCH'])
     def patch(self, id):
         supplier = self.get_obj(id)
-        args = get_args(writable_schema)
+        args = get_args(s_schema)
         for k, v in args.items():
             setattr(supplier, k, v)
         db.session.commit()
