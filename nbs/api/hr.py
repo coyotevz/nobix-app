@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from flask import jsonify, request, url_for
+from webargs import ValidationError
 from nbs.models import db, Employee, AttendanceRecord
 from nbs.schema import EmployeeSchema, AttendanceRecordSchema
 from nbs.utils.api import ResourceApi, NestedApi, route, build_result
-from nbs.utils.args import get_args, build_args, fields, ValidationError
+from nbs.utils.args import get_args, build_args, fields
 from nbs.utils.attendance import fixed_records
 
 employee_s = EmployeeSchema()

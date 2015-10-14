@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from flask import jsonify, request, url_for
+from webargs import ValidationError
 from nbs.models import db, Supplier
 from nbs.schema import EntitySchema, BankAccountSchema
 from nbs.utils.api import ResourceApi, NestedApi, route, build_result
-from nbs.utils.args import get_args, build_args, fields, ValidationError
+from nbs.utils.args import get_args, build_args, fields
 from nbs.api.bank_account import BankAccountApi
 
 
 def unique_supplier_name(val):
     exists = Supplier.query.filter(Supplier.name==val).first()
     if exists is not None:
+        import pudb; pudb.set_trace()
         raise ValidationError('Supplier name must be unique', status_code=409)
 
 

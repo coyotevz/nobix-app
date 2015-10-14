@@ -3,7 +3,6 @@
 from flask import request
 from marshmallow import Schema, fields
 from marshmallow.compat import text_type as _text_type
-from webargs import ValidationError
 from webargs.flaskparser import FlaskParser, abort as _abort
 import warnings
 

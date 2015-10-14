@@ -2,10 +2,11 @@
 
 from flask import jsonify, url_for, abort
 from sqlalchemy.exc import IntegrityError
+from webargs import ValidationError
 from nbs.models import db, Bank, BankAccount
 from nbs.schema import BankAccountSchema, BankSchema
 from nbs.utils.api import ResourceApi, route, build_result
-from nbs.utils.args import fields, get_args, build_args, ValidationError
+from nbs.utils.args import fields, get_args, build_args
 
 ba_schema = BankAccountSchema()
 post_ba_schema = BankAccountSchema(exclude=('bank','supplier_name'))
