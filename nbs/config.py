@@ -9,6 +9,7 @@ class Config(object):
     TESTING = False
     SECRET_KEY = '<must be secret>' # use os.random(24) to generate this
     CRSF_ENABLED = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class DevelopmentConfig(Config):
