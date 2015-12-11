@@ -85,30 +85,6 @@ class PurchaseDocumentSchema(TimestampSchema):
     supplier_name = fields.String(attribute='supplier.name')
 
 
-class PurchaseOrderSchema(TimestampSchema):
-    id = fields.Integer()
-    number = fields.Integer()
-    issue = fields.DateTime(attribute='issue_date')
-    notes = fields.String()
-    status = fields.String(attribute='status_str')
-    notify = fields.String(attribute='notify_str')
-    supplier_id = fields.Integer()
-    supplier_name = fields.String(attribute='supplier.name')
-
-    items = fields.Nested('PurchaseOrderItemSchema', many=True,
-                          exclude=('id', 'order_id'))
-
-
-class PurchaseOrderItemSchema(Schema):
-    id = fields.Integer()
-    sku = fields.String()
-    description = fields.String()
-    quantity = fields.Integer()
-    received_quantity = fields.Integer()
-    index = fields.Integer(attribute='order_index')
-    order_id = fields.Integer()
-
-
 class ProductSchema(TimestampSchema):
     id = fields.Integer()
     sku = fields.String()

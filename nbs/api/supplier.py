@@ -6,7 +6,9 @@ from nbs.models import db, Supplier
 from nbs.schema import EntitySchema, BankAccountSchema
 from nbs.utils.api import ResourceApi, NestedApi, route, build_result
 from nbs.utils.args import get_args, build_args, fields
+
 from nbs.api.bank_account import BankAccountApi
+from nbs.api.purchase_order import PurchaseOrderApi
 
 
 def unique_supplier_name(val):
@@ -115,3 +117,4 @@ class SupplierApi(ResourceApi):
         return jsonify(**Supplier._freight_types)
 
     accounts = NestedApi(BankAccountApi, pk_converter='int')
+    orders = NestedApi(PurchaseOrderApi, pk_converter='int')
