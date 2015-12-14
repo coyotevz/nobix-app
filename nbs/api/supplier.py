@@ -7,21 +7,39 @@ from marshmallow.validate import Length
 
 from nbs.models import db, Supplier
 from nbs.utils.api import build_result
+from nbs.utils.schema import EntitySchema, FiscalDataSchema
 
 
-class SupplierSchema(Schema):
+class SupplierSchema(EntitySchema):
     id = fields.Int(dump_only=True)
     name = fields.String(required=True, validate=[Length(min=2)])
+    fiscal_data = fields.Nested(FiscalDataSchema)
+    customer_no = fields.String()
+    payment_term = fields.Integer()
+    leap_time = fields.Integer()
+    freight_type = fields.String(attribute='freight_type_str')
 
     @validates('name')
     def validate_unique_name(self, value):
         exists = Supplier.query.filter(Supplier.name==value).first()
         if exists is not None:
+            if self.context.get('supplier_id', None) == exists.id:
+                return True
             raise ValidationError('Supplier name must be unique',
                                   status_code=409)
 
+    @validates('freight_type')
+    def validate_freight_type(self, value):
+        if value not in Supplier._freight_types.keys():
+            raise ValidationError('Invalid freight_type, consult {}'.format(
+                url_for('.get_freight_types', _external=True)))
+
     @post_load
     def make_supplier(self, data):
+        if 'freight_type_str' in data:
+            data['freight_type'] = data.pop('freight_type_str')
+        if self.partial:
+            return data
         return Supplier(**data)
 
     class Meta:
@@ -63,9 +81,23 @@ def new_supplier():
     return '', 201, {'Location': url_for('.get_supplier', id=supplier.id,
                                          _external=True)}
 
+@supplier_api.route('/<int:id>', methods=['PATCH'])
+def update_supplier(id):
+    supplier = Supplier.query.get_or_404(id)
+    schema = SupplierSchema(partial=True, context={'supplier_id': id})
+    args = parser.parse(schema)
+    for k, v in args.items():
+        setattr(supplier, k, v)
+    db.session.commit()
+    return '', 204
+
 @supplier_api.route('/<int:id>', methods=['DELETE'])
 def delete_supplier(id):
     supplier = Supplier.query.get_or_404(id)
     db.session.delete(supplier)
     db.session.commit()
     return '', 204
+
+@supplier_api.route('/freight_types')
+def get_freight_types():
+    return jsonify(**Supplier._freight_types)
