@@ -3,11 +3,13 @@
 from flask import Blueprint, jsonify, url_for
 
 #from nbs.api.user import UserApi
-from nbs.api.supplier import SupplierApi
-from nbs.api.hr import EmployeeApi
-from nbs.api.bank_account import BankApi
-from nbs.api.purchase_order import PurchaseOrderApi
-from nbs.api.product import ProductApi
+#from nbs.api.supplier import SupplierApi
+#from nbs.api.hr import EmployeeApi
+#from nbs.api.bank_account import BankApi
+#from nbs.api.purchase_order import PurchaseOrderApi
+#from nbs.api.product import ProductApi
+
+from nbs.api.supplier import supplier_api
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
@@ -26,9 +28,10 @@ def documentation():
 
 def configure_api(app):
     app.register_blueprint(api)
+    app.register_blueprint(supplier_api)
     #UserApi.register(app)
-    SupplierApi.register(app)
-    EmployeeApi.register(app)
-    BankApi.register(app)
-    PurchaseOrderApi.register(app)
-    ProductApi.register(app)
+    #SupplierApi.register(app)
+    #EmployeeApi.register(app)
+    #BankApi.register(app)
+    #PurchaseOrderApi.register(app)
+    #ProductApi.register(app)
