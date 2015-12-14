@@ -38,7 +38,8 @@ def get_suppliers():
     """
     Returns a paginated list of suppliers that match with the given conditions.
     """
-    return build_result(Supplier.query.order_by(Supplier.name), supplier_schema)
+    q = Supplier.query.order_by(Supplier.name)
+    return build_result(q, supplier_schema)
 
 @supplier_api.route('/<int:id>')
 def get_supplier(id):
@@ -59,4 +60,12 @@ def new_supplier():
     supplier = parser.parse(supplier_schema)
     db.session.add(supplier)
     db.session.commit()
-    return '', 201, {'Location': url_for('.get_supplier', id=supplier.id, _external=True)}
+    return '', 201, {'Location': url_for('.get_supplier', id=supplier.id,
+                                         _external=True)}
+
+@supplier_api.route('/<int:id>', methods=['DELETE'])
+def delete_supplier(id):
+    supplier = Supplier.query.get_or_404(id)
+    db.session.delete(supplier)
+    db.session.commit()
+    return '', 204
