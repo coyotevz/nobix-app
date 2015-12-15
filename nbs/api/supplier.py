@@ -5,7 +5,7 @@ from webargs.flaskparser import parser
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from marshmallow.validate import Length
 
-from nbs.models import db, Supplier
+from nbs.models import db, Supplier, BankAccount
 from nbs.utils.api import build_result
 from nbs.utils.schema import EntitySchema, FiscalDataSchema
 
@@ -18,6 +18,9 @@ class SupplierSchema(EntitySchema):
     payment_term = fields.Integer()
     leap_time = fields.Integer()
     freight_type = fields.String(attribute='freight_type_str')
+
+    bank_accounts = fields.Nested('BankAccountSchema', many=True,
+                                  only=('id', 'bank', 'type'))
 
     @validates('name')
     def validate_unique_name(self, value):
@@ -46,18 +49,31 @@ class SupplierSchema(EntitySchema):
         strict = True
 
 
+class BankAccountSchema(Schema):
+    id = fields.Integer(dump_only=True)
+    bank = fields.String(attribute='bank.name')
+    bank_id = fields.Integer()
+    branch = fields.String(attribute='bank_branch')
+    type = fields.String(attribute='account_type_str')
+    number = fields.String(attribute='account_number')
+    cbu = fields.String(attribute='account_cbu')
+    owner = fields.String(attribute='account_owner')
+    supplier_id = fields.Integer()
+    supplier_name = fields.String(attribute='supplier.name')
+
+
 supplier_api = Blueprint('api.supplier', __name__, url_prefix='/api/suppliers')
 
 supplier_schema = SupplierSchema()
 
 
 @supplier_api.route('')
-def get_suppliers():
+def list_suppliers():
     """
     Returns a paginated list of suppliers that match with the given conditions.
     """
     q = Supplier.query.order_by(Supplier.name)
-    return build_result(q, supplier_schema)
+    return build_result(q, SupplierSchema(exclude=('bank_accounts',)))
 
 @supplier_api.route('/<int:id>')
 def get_supplier(id):
@@ -65,7 +81,7 @@ def get_supplier(id):
     return build_result(supplier, supplier_schema)
 
 @supplier_api.route('/<rangelist:ids>')
-def get_suppliers_range(ids):
+def list_suppliers_range(ids):
     suppliers = []
     for id in ids:
         s = Supplier.query.get(id)
@@ -99,5 +115,11 @@ def delete_supplier(id):
     return '', 204
 
 @supplier_api.route('/freight_types')
-def get_freight_types():
+def list_freight_types():
     return jsonify(**Supplier._freight_types)
+
+@supplier_api.route('/<int:id>/accounts')
+def list_bank_accounts(id):
+    supplier = Supplier.query.get_or_404(id)
+    q = BankAccount.query.filter(BankAccount.supplier==supplier)
+    return build_result(q, BankAccountSchema(exclude=('id', 'supplier_name')))
