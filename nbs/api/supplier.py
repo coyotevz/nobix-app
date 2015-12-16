@@ -122,4 +122,4 @@ def list_freight_types():
 def list_bank_accounts(id):
     supplier = Supplier.query.get_or_404(id)
     q = BankAccount.query.filter(BankAccount.supplier==supplier)
-    return build_result(q, BankAccountSchema(exclude=('id', 'supplier_name')))
+    return build_result(q, BankAccountSchema(exclude=('supplier_name')))
