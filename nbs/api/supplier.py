@@ -5,7 +5,7 @@ from webargs.flaskparser import parser
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from marshmallow.validate import Length
 
-from nbs.models import db, Supplier, BankAccount
+from nbs.models import db, Supplier, BankAccount, Bank
 from nbs.utils.api import build_result
 from nbs.utils.schema import EntitySchema, FiscalDataSchema
 
@@ -52,14 +52,44 @@ class SupplierSchema(EntitySchema):
 class BankAccountSchema(Schema):
     id = fields.Integer(dump_only=True)
     bank = fields.String(attribute='bank.name')
-    bank_id = fields.Integer()
-    branch = fields.String(attribute='bank_branch')
+    bank_id = fields.Integer(required=True)
+    branch = fields.String(attribute='bank_branch', required=True)
     type = fields.String(attribute='account_type_str')
-    number = fields.String(attribute='account_number')
+    number = fields.String(attribute='account_number', required=True)
     cbu = fields.String(attribute='account_cbu')
     owner = fields.String(attribute='account_owner')
-    supplier_id = fields.Integer()
+    supplier_id = fields.Integer(required=True)
     supplier_name = fields.String(attribute='supplier.name')
+
+    @validates('bank_id')
+    def validate_bank_id(self, value):
+        bank = Bank.query.get(int(value))
+        if not bank:
+            raise ValidationError('Invalid bank_id, consult {}'.format(
+                url_for('api.bank.list_banks', _external=True)))
+
+    @validates('type')
+    def validate_type(self, value):
+        if value not in BankAccount._account_types.keys():
+            raise ValidationError('Invalid type, consult {}'.format(
+                url_for('api.bank.list_account_types', _external=True)))
+
+    @validates('cbu')
+    def validate_cbu(self, value):
+        # 1. check lenght = 20
+        # 2. check numbers only
+        pass
+
+    @post_load
+    def make_bank_account(self, data):
+        if 'account_type_str' in data:
+            data['account_type'] = data.pop('account_type_str')
+        if self.partial:
+            return data
+        return BankAccount(**data)
+
+    class Meta:
+        strict = True
 
 
 supplier_api = Blueprint('api.supplier', __name__, url_prefix='/api/suppliers')
@@ -123,3 +153,13 @@ def list_bank_accounts(id):
     supplier = Supplier.query.get_or_404(id)
     q = BankAccount.query.filter(BankAccount.supplier==supplier)
     return build_result(q, BankAccountSchema(exclude=('supplier_name')))
+
+@supplier_api.route('/<int:id>/accounts', methods=['POST'])
+def new_bank_account(id):
+    supplier = Supplier.query.get_or_404(id)
+    account = parser.parse(BankAccountSchema(exclude=('supplier_id',)))
+    account.supplier = supplier
+    db.session.add(account)
+    db.session.commit()
+    return '', 201, {'Location': url_for('.get_bank_account', sid=supplier.id,
+                                         baid=account.id, _external=True)}

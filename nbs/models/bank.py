@@ -23,7 +23,7 @@ class BankAccount(db.Model):
     TYPE_CA_USD = 'TYPE_CA_USD'
     TYPE_UNIQUE = 'TYPE_UNIQUE'
 
-    _account_type = {
+    _account_types = {
         TYPE_CC_PESOS: 'Cuenta Corriente en Pesos',
         TYPE_CC_USD: 'Cuenta Corriente en Dólares',
         TYPE_CA_PESOS: 'Caja de Ahorro en Pesos',
@@ -34,7 +34,7 @@ class BankAccount(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     bank_branch = db.Column(db.Unicode)
-    account_type = db.Column(db.Enum(*_account_type.keys(),
+    account_type = db.Column(db.Enum(*_account_types.keys(),
                              name='account_type'), default=TYPE_CC_PESOS)
     account_number = db.Column(db.Unicode)
     account_cbu = db.Column(db.Unicode)

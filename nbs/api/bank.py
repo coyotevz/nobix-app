@@ -64,4 +64,4 @@ def delete_bank(id):
 
 @bank_api.route('/account_types')
 def list_account_types():
-    return jsonify(**BankAccount._account_type)
+    return jsonify(**BankAccount._account_types)
