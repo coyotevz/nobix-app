@@ -8,7 +8,7 @@ from marshmallow.validate import Length
 from nbs.models import db, Supplier, BankAccount, Bank
 from nbs.utils.api import build_result
 from nbs.utils.schema import EntitySchema, FiscalDataSchema
-from nbs.utils.validators import validate_cbu as is_valid_cbu
+from nbs.utils.validators import validate_cbu
 
 
 class SupplierSchema(EntitySchema):
@@ -57,7 +57,7 @@ class BankAccountSchema(Schema):
     branch = fields.String(attribute='bank_branch', required=True)
     type = fields.String(attribute='account_type_str')
     number = fields.String(attribute='account_number', required=True)
-    cbu = fields.String(attribute='account_cbu', validate=is_valid_cbu)
+    cbu = fields.String(attribute='account_cbu', validate=validate_cbu)
     owner = fields.String(attribute='account_owner')
     supplier_id = fields.Integer(required=True)
     supplier_name = fields.String(attribute='supplier.name')
