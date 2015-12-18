@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, request, jsonify, url_for
+from flask import Blueprint, request, jsonify, url_for, abort
 from webargs.flaskparser import parser
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from marshmallow.validate import Length
@@ -8,6 +8,7 @@ from marshmallow.validate import Length
 from nbs.models import db, Supplier, BankAccount, Bank
 from nbs.utils.api import build_result
 from nbs.utils.schema import EntitySchema, FiscalDataSchema
+from nbs.utils.validators import validate_cbu as is_valid_cbu
 
 
 class SupplierSchema(EntitySchema):
@@ -56,7 +57,7 @@ class BankAccountSchema(Schema):
     branch = fields.String(attribute='bank_branch', required=True)
     type = fields.String(attribute='account_type_str')
     number = fields.String(attribute='account_number', required=True)
-    cbu = fields.String(attribute='account_cbu')
+    cbu = fields.String(attribute='account_cbu', validate=is_valid_cbu)
     owner = fields.String(attribute='account_owner')
     supplier_id = fields.Integer(required=True)
     supplier_name = fields.String(attribute='supplier.name')
@@ -74,16 +75,12 @@ class BankAccountSchema(Schema):
             raise ValidationError('Invalid type, consult {}'.format(
                 url_for('api.bank.list_account_types', _external=True)))
 
-    @validates('cbu')
-    def validate_cbu(self, value):
-        # 1. check lenght = 20
-        # 2. check numbers only
-        pass
-
     @post_load
     def make_bank_account(self, data):
         if 'account_type_str' in data:
             data['account_type'] = data.pop('account_type_str')
+        if 'account_cbu' in data:
+            data['account_cbu'] = data.pop('account_cbu').replace(" ", "")
         if self.partial:
             return data
         return BankAccount(**data)
@@ -161,5 +158,33 @@ def new_bank_account(id):
     account.supplier = supplier
     db.session.add(account)
     db.session.commit()
-    return '', 201, {'Location': url_for('.get_bank_account', sid=supplier.id,
+    return '', 201, {'Location': url_for('.get_bank_account', id=supplier.id,
                                          baid=account.id, _external=True)}
+
+def get_bank_account_for_supplier_or_404(supplier_id, bank_account_id):
+    supplier = Supplier.query.get_or_404(supplier_id)
+    bank_account = BankAccount.query.get_or_404(bank_account_id)
+    if bank_account.supplier != supplier:
+        abort(404)
+    return bank_account
+
+@supplier_api.route('/<int:id>/accounts/<int:baid>')
+def get_bank_account(id, baid):
+    account = get_bank_account_for_supplier_or_404(id, baid)
+    return build_result(account, BankAccountSchema())
+
+@supplier_api.route('/<int:id>/accounts/<int:baid>', methods=['PATCH'])
+def update_bank_account(id, baid):
+    account = get_bank_account_for_supplier_or_404(id, baid)
+    args = parser.parse(BankAccountSchema(partial=True))
+    for k, v in args.items():
+        setattr(account, k, v)
+    db.session.commit()
+    return '', 204
+
+@supplier_api.route('/<int:id>/accounts/<int:baid>', methods=['DELETE'])
+def delete_bank_account(id, baid):
+    account = get_bank_account_for_supplier_or_404(id, baid)
+    db.session.delete(account)
+    db.session.commit()
+    return '', 204

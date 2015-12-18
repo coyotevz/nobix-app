@@ -35,7 +35,7 @@ class BankAccount(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     bank_branch = db.Column(db.Unicode)
     account_type = db.Column(db.Enum(*_account_types.keys(),
-                             name='account_type'), default=TYPE_CC_PESOS)
+                             name='account_types'), default=TYPE_CC_PESOS)
     account_number = db.Column(db.Unicode)
     account_cbu = db.Column(db.Unicode)
     account_owner = db.Column(db.Unicode)
@@ -49,7 +49,7 @@ class BankAccount(db.Model):
 
     @property
     def account_type_str(self):
-        return self._account_type[self.account_type]
+        return self._account_types[self.account_type]
 
     def __repr__(self):
         return "<BankAccount '{}, {}: {}' of '{}'>".format(
