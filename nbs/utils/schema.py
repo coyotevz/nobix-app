@@ -2,6 +2,7 @@
 
 from marshmallow import Schema, fields
 from nbs.models import Employee
+from nbs.utils.validators import validate_cuit
 
 
 class _RefEntitySchema(Schema):
@@ -62,7 +63,7 @@ class SupplierContactSchema(Schema):
 class FiscalDataSchema(Schema):
     id = fields.Integer()
     fiscal_type = fields.String(attribute='fiscal_type_str')
-    cuit = fields.Method('serialize_cuit', 'deserialize_cuit')
+    cuit = fields.Method('serialize_cuit', 'deserialize_cuit', validate=validate_cuit)
 
 
     def serialize_cuit(self, obj):
