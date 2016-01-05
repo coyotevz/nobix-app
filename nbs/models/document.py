@@ -65,12 +65,12 @@ class PurchaseOrder(db.Model, TimestampMixin):
     __tablename__ = 'purchase_order'
 
     STATUS_CANCELLED = 'STATUS_CANCELLED'
-    STATUS_QUOTING   = 'STATUS_QUOTING'
-    STATUS_PENDING   = 'STATUS_PENDING'
-    STATUS_PARTIAL   = 'STATUS_PARTIAL'
+    STATUS_QUOTING = 'STATUS_QUOTING'
+    STATUS_PENDING = 'STATUS_PENDING'
+    STATUS_PARTIAL = 'STATUS_PARTIAL'
     STATUS_CONFIRMED = 'STATUS_CONFIRMED'
-    STATUS_CLOSED    = 'STATUS_CLOSED'
-    STATUS_DRAFT     = 'STATUS_DRAFT'
+    STATUS_CLOSED = 'STATUS_CLOSED'
+    STATUS_DRAFT = 'STATUS_DRAFT'
 
     _order_status = {
         STATUS_CANCELLED: 'Cancelada',
@@ -82,9 +82,9 @@ class PurchaseOrder(db.Model, TimestampMixin):
         STATUS_DRAFT: 'Borrador',
     }
 
-    NOTIFY_EMAIL      = 'NOTIFY_EMAIL'
-    NOTIFY_FAX        = 'NOTIFY_FAX'
-    NOTIFY_PHONE      = 'NOTIFY_PHONE'
+    NOTIFY_EMAIL = 'NOTIFY_EMAIL'
+    NOTIFY_FAX = 'NOTIFY_FAX'
+    NOTIFY_PHONE = 'NOTIFY_PHONE'
     NOTIFY_PERSONALLY = 'NOTIFY_PERSONALLY'
 
     _notify = {
@@ -118,7 +118,7 @@ class PurchaseOrder(db.Model, TimestampMixin):
         self.items.append(item)
 
     def reindex_items(self, start=1, shift=0):
-        items = self.items.filter(PurchaseOrderItem.order_index>=start).all()
+        items = self.items.filter(PurchaseOrderItem.order_index >= start).all()
         for idx, item in reversed(list(enumerate(items, start=(start+shift)))):
             # This modifies unique key so do in subtransactions
             with db.session.begin(subtransactions=True):
@@ -141,7 +141,7 @@ class PurchaseOrderItem(db.Model):
     )
 
     id = db.Column(db.Integer, primary_key=True)
-    sku = db.Column(db.Unicode) # codigo producto
+    sku = db.Column(db.Unicode)  # codigo producto
     description = db.Column(db.Unicode)
     quantity = db.Column(db.Integer, nullable=False)
     received_quantity = db.Column(db.Integer, default=0)
@@ -153,6 +153,7 @@ class PurchaseOrderItem(db.Model):
     order = db.relationship(PurchaseOrder,
                             backref=db.backref('items', lazy='dynamic',
                                                order_by=order_index))
+
     def __repr__(self):
         return "<PurchaseOrderItem {} '{} {} * {}' of PO{}>".format(
                 self.order_index, self.sku, self.description, self.quantity,

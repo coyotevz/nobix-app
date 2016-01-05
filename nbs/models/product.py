@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
 from nbs.models import db
 from nbs.models.misc import TimestampMixin
 
@@ -17,7 +16,7 @@ class ProductCategory(db.Model):
     name = db.Column(db.Unicode)
 
     #: suggested markup components for calculating the product's price
-    #suggested_markup_components = db.relationship('PriceComponent',
+    # suggested_markup_components = db.relationship('PriceComponent',
     #        backref=db.backref('category_markup', lazy='dynamic'),
     #        secondary=lambda: productcategory_pricecomponent)
 
@@ -33,7 +32,8 @@ class ProductCategory(db.Model):
         Returns the commission for this category.
         If it's unset, return the value of the base category, if any.
         """
-        return self.suggested_commission or self.parent and self.parent.get_commision()
+        return self.suggested_commission or\
+            self.parent and self.parent.get_commision()
 
     def get_markup(self):
         """
@@ -112,8 +112,8 @@ class Product(db.Model, TimestampMixin):
     commission = db.Column(db.Numeric(10, 5))
 
     #: unit of the product, kg, l, etc.
-    #unit_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
-    #unit = db.relationship('ProductUnit', backref=db.backref('products',
+    # unit_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
+    # unit = db.relationship('ProductUnit', backref=db.backref('products',
     #                                                         lazy='dynamic'))
 
     #: category this product belong to
@@ -121,9 +121,9 @@ class Product(db.Model, TimestampMixin):
     category = db.relationship('ProductCategory',
                                backref=db.backref('products', lazy='dynamic'))
 
-    #tax_constant_id = db.Column(db.Integer,
+    # tax_constant_id = db.Column(db.Integer,
     #                            db.ForeignKey('tax_constant.id'))
-    #tax_constant = db.relationship('TaxConstant',
+    # tax_constant = db.relationship('TaxConstant',
     #                               backref=db.backref('products',
     #                                                  lazy='dynamic'))
 
@@ -137,7 +137,7 @@ class Product(db.Model, TimestampMixin):
     #: 'modified' field added by TimestampMixin
 
     #: PriceComponents for automatic price calculation:
-    #markup_components = db.relationship('PriceComponent',
+    # markup_components = db.relationship('PriceComponent',
     #        backref=db.backref("product_markup", lazy='dynamic'),
     #        secondary=lambda: product_pricecomponent)
 
@@ -148,18 +148,18 @@ class Product(db.Model, TimestampMixin):
     #: When calculate the product cost and we have multiple suppliers for the
     #: same product, this field indacates that we need to use this info for
     #: calculus. A product can have only one main_supplier_info.
-    #main_supplier_info_id = db.Column(
+    # main_supplier_info_id = db.Column(
     #        db.Integer, db.ForeignKey('product_supplier_info.supplier_id',
     #                                  use_alter=True,
     #                                  name='fk_main_supplier_info'))
-    #main_supplier_info = db.relationship(
+    # main_supplier_info = db.relationship(
     #    'ProductSupplierInfo',
     #    primaryjoin="and_("
     #        "Product.main_supplier_info_id==ProductSupplierInfo.supplier_id,"
     #        "Product.id==ProductSupplierInfo.product_id)",
     #    foreign_keys=[main_supplier_info_id, id],
     #    post_update=True
-    #)
+    # )
 
     @property
     def cost(self):
@@ -195,7 +195,7 @@ class Product(db.Model, TimestampMixin):
             StockTransaction.types
         :param unit_cost: unit cost of the new stock or `None`
         """
-        assert (type in StockTransaction.types)
+        # assert (type in StockTransaction.types)
 
         if quantity <= 0:
             raise ValueError('quantity must be a positive integer')
@@ -215,7 +215,7 @@ class Product(db.Model, TimestampMixin):
         :param type: the type of the stock drecrease. One of
             StockTransaction.types
         """
-        assert (type in StockTransaction.types)
+        # assert (type in StockTransaction.types)
 
         if quantity <= 0:
             raise ValueError('quantity must be a positive integer')

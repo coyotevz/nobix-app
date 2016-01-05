@@ -31,7 +31,6 @@ class BankAccount(db.Model):
         TYPE_UNIQUE: 'Cuenta Única',
     }
 
-
     id = db.Column(db.Integer, primary_key=True)
     bank_branch = db.Column(db.Unicode)
     account_type = db.Column(db.Enum(*_account_types.keys(),
@@ -39,7 +38,6 @@ class BankAccount(db.Model):
     account_number = db.Column(db.Unicode)
     account_cbu = db.Column(db.Unicode)
     account_owner = db.Column(db.Unicode)
-
 
     bank_id = db.Column(db.Integer, db.ForeignKey('bank.id'), nullable=False)
     bank = db.relationship(Bank, backref="accounts")

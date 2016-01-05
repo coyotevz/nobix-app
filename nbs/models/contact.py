@@ -14,7 +14,6 @@ class Contact(Entity):
     last_name = Entity._name_2
 
 
-
 class SupplierContact(db.Model):
     __tablename__ = 'supplier_contact'
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.supplier_id'),

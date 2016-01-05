@@ -18,7 +18,8 @@ class AttendanceRecord(db.Model):
 
     def __repr__(self):
         return "<Record({}, {} {})>".format(self.user_code,
-            self.datetime.isoformat(' '), "OUT" if self.type_code else "IN")
+                                            self.datetime.isoformat(' '),
+                                            "OUT" if self.type_code else "IN")
 
 
 class Employee(Entity):
@@ -55,8 +56,8 @@ class Employee(Entity):
 
     def month_records(self, year, month):
         return self.records\
-                .filter(db.extract('year', AttendanceRecord.datetime)==year)\
-                .filter(db.extract('month', AttendanceRecord.datetime)==month)
+            .filter(db.extract('year', AttendanceRecord.datetime) == year)\
+            .filter(db.extract('month', AttendanceRecord.datetime) == month)
 
     def __repr__(self):
         return "<Employee '{}', age {}>".format(self.name, self.age.years)
