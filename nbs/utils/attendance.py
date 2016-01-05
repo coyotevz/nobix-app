@@ -1,6 +1,6 @@
-from collections import namedtuple, OrderedDict
+from collections import namedtuple
 from itertools import groupby, chain
-from datetime import datetime, time, date, timedelta
+from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY
 from dateutil.parser import parse
@@ -19,6 +19,7 @@ worktime_spec = {
     5: (['9:00', '13:00'],),
 }
 
+
 def perfect_grid(year, month):
     sdate = date(year, month, 1)
     edate = sdate+relativedelta(day=31)
@@ -27,8 +28,8 @@ def perfect_grid(year, month):
                      byweekday=worktime_spec.keys())
 
     grid = [(day.date(),
-             [Interval(parse(i[0]).time(), parse(i[1]).time())\
-              for i in worktime_spec.get(day.weekday())])\
+             [Interval(parse(i[0]).time(), parse(i[1]).time())
+              for i in worktime_spec.get(day.weekday())])
             for day in workdays]
     return grid
 
@@ -39,8 +40,10 @@ def time_diff(t1, t2):
     t2_sec = (t2.hour*60+t2.minute)*60+t2.second
     return timedelta(seconds=t1_sec-t2_sec)
 
+
 def _gdate(item):
     return item.datetime.date()
+
 
 def min_diff_index(l, t):
     "Return index of the minimum difference"
@@ -53,9 +56,11 @@ def min_diff_index(l, t):
             cd = diff
     return ci
 
+
 def grouped(iterable, n=2):
     "Return n elements at time from iterable"
     return zip(*[iter(iterable)]*n)
+
 
 def fixed_records(query, year, month):
     """Return a list with fixed records from query.
@@ -64,8 +69,8 @@ def fixed_records(query, year, month):
     """
     grid = perfect_grid(year, month)
 
-    records = dict((day, [r.datetime.time() for r in record])\
-                    for day, record in groupby(query, _gdate))
+    records = dict((day, [r.datetime.time() for r in record])
+                   for day, record in groupby(query, _gdate))
 
     fixed = []
     for day, intervals in grid:

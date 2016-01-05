@@ -1,5 +1,5 @@
 Flask
-SQLAlchemy==1.0.9
+SQLAlchemy
 Flask-Script
 Flask-SQLAlchemy
 psycopg2

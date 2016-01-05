@@ -49,7 +49,7 @@ class Address(RefEntityMixin, db.Model):
     province = db.Column(db.Unicode(32), nullable=False)
     postal_code = db.Column(db.Unicode(32))
 
-    def __str__(eslf):
+    def __str__(self):
         retval = self.street
         if self.city:
             retval += ", {}".format(self.city)

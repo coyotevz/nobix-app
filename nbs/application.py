@@ -8,7 +8,7 @@ from werkzeug.exceptions import default_exceptions, HTTPException
 from webargs.flaskparser import abort
 
 from nbs.models import configure_db
-#from nbs.auth import configure_auth
+# from nbs.auth import configure_auth
 from nbs.api import configure_api
 from nbs.utils.converters import (
     ListConverter, RangeConverter, RangeListConverter
@@ -27,7 +27,7 @@ def create_app(config=None, app_name=None):
 
     configure_app(app, config)
     configure_db(app)
-    #configure_auth(app)
+    # configure_auth(app)
     configure_api(app)
 
     return app
@@ -42,7 +42,6 @@ def configure_app(app, config=None):
             app.config.from_object('localconfig.LocalConfig')
         except ImportError:
             app.config.from_object('nbs.config.DevelopmentConfig')
-
 
     # Add additional converters
     app.url_map.converters['list'] = ListConverter
@@ -62,7 +61,7 @@ def configure_app(app, config=None):
             request.page = int(request.args.get('page', 1))
             request.per_page = min(int(request.args.get('per_page', 25)),
                                    max_per_page)
-        except ValueError as e:
+        except ValueError:
             abort(400, message='Invalid parameter type')
 
     @app.after_request
@@ -76,12 +75,11 @@ def configure_app(app, config=None):
             a('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
         return response
 
-
     @app.route('/urls')
     def show_urls():
         column_headers = ('Rule', 'Endpoint', 'Methods')
         order = 'rule'
-        rows = [('-'*4, '-'*8, '-'*9)] # minimal values to take
+        rows = [('-'*4, '-'*8, '-'*9)]  # minimal values to take
         rules = sorted(app.url_map.iter_rules(),
                        key=lambda rule: getattr(rule, order))
         for rule in rules:
