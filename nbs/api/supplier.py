@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, request, jsonify, url_for, abort
+from flask import Blueprint, jsonify, url_for, abort
 from webargs.flaskparser import parser
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from marshmallow.validate import Length
@@ -25,7 +25,7 @@ class SupplierSchema(EntitySchema):
 
     @validates('name')
     def validate_unique_name(self, value):
-        exists = Supplier.query.filter(Supplier.name==value).first()
+        exists = Supplier.query.filter(Supplier.name == value).first()
         if exists is not None:
             if self.context.get('supplier_id', None) == exists.id:
                 return True
@@ -102,10 +102,12 @@ def list_suppliers():
     q = Supplier.query.order_by(Supplier.name)
     return build_result(q, SupplierSchema(exclude=('bank_accounts',)))
 
+
 @supplier_api.route('/<int:id>')
 def get_supplier(id):
     supplier = Supplier.query.get_or_404(id)
     return build_result(supplier, supplier_schema)
+
 
 @supplier_api.route('/<rangelist:ids>')
 def list_suppliers_range(ids):
@@ -116,6 +118,7 @@ def list_suppliers_range(ids):
             suppliers.append(s)
     return build_result(suppliers, supplier_schema)
 
+
 @supplier_api.route('', methods=['POST'])
 def new_supplier():
     supplier = parser.parse(supplier_schema)
@@ -124,7 +127,8 @@ def new_supplier():
     return '', 201, {'Location': url_for('.get_supplier', id=supplier.id,
                                          _external=True)}
 
-@supplier_api.route('/<int:id>', methods=['PATCH'])
+
+@supplier_api.route('/<int:id>', methods=['PATCH', 'PUT'])
 def update_supplier(id):
     supplier = Supplier.query.get_or_404(id)
     schema = SupplierSchema(partial=True, context={'supplier_id': id})
@@ -134,6 +138,7 @@ def update_supplier(id):
     db.session.commit()
     return '', 204
 
+
 @supplier_api.route('/<int:id>', methods=['DELETE'])
 def delete_supplier(id):
     supplier = Supplier.query.get_or_404(id)
@@ -141,15 +146,18 @@ def delete_supplier(id):
     db.session.commit()
     return '', 204
 
+
 @supplier_api.route('/freight_types')
 def list_freight_types():
     return jsonify(**Supplier._freight_types)
 
+
 @supplier_api.route('/<int:id>/accounts')
 def list_bank_accounts(id):
     supplier = Supplier.query.get_or_404(id)
-    q = BankAccount.query.filter(BankAccount.supplier==supplier)
+    q = BankAccount.query.filter(BankAccount.supplier == supplier)
     return build_result(q, BankAccountSchema(exclude=('supplier_name')))
+
 
 @supplier_api.route('/<int:id>/accounts', methods=['POST'])
 def new_bank_account(id):
@@ -161,6 +169,7 @@ def new_bank_account(id):
     return '', 201, {'Location': url_for('.get_bank_account', id=supplier.id,
                                          baid=account.id, _external=True)}
 
+
 def get_bank_account_for_supplier_or_404(supplier_id, bank_account_id):
     supplier = Supplier.query.get_or_404(supplier_id)
     bank_account = BankAccount.query.get_or_404(bank_account_id)
@@ -168,10 +177,12 @@ def get_bank_account_for_supplier_or_404(supplier_id, bank_account_id):
         abort(404)
     return bank_account
 
+
 @supplier_api.route('/<int:id>/accounts/<int:baid>')
 def get_bank_account(id, baid):
     account = get_bank_account_for_supplier_or_404(id, baid)
     return build_result(account, BankAccountSchema())
+
 
 @supplier_api.route('/<int:id>/accounts/<int:baid>', methods=['PATCH'])
 def update_bank_account(id, baid):
@@ -181,6 +192,7 @@ def update_bank_account(id, baid):
         setattr(account, k, v)
     db.session.commit()
     return '', 204
+
 
 @supplier_api.route('/<int:id>/accounts/<int:baid>', methods=['DELETE'])
 def delete_bank_account(id, baid):
