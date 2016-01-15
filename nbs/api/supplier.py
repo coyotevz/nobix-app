@@ -36,7 +36,7 @@ class SupplierSchema(EntitySchema):
     def validate_freight_type(self, value):
         if value not in Supplier._freight_types.keys():
             raise ValidationError('Invalid freight_type, consult {}'.format(
-                url_for('.get_freight_types', _external=True)))
+                url_for('.list_freight_types', _external=True)))
 
     @post_load
     def make_supplier(self, data):
