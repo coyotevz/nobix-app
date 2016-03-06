@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 ### Probando edicion
 
 Esto es una prueba de edición directa en markdown, según dicen es obligatorio
