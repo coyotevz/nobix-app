@@ -16,24 +16,27 @@ from nbs.models import db
 
 manager = Manager(create_app)
 
+
 @manager.command
 def initdb(create_admin_user=True, with_fixtures=False):
     """Creates database tables"""
     db.create_all()
-    #from nbs.models.product import create_primitive_units
-    #create_primitive_units()
-    #if create_admin_user:
-    #    from nbs.models.user import create_admin_user
-    #    create_admin_user()
-    #if with_fixtures:
-    #    from nbs.sample_data import install_fixtures
-    #    install_fixtures()
+    # from nbs.models.product import create_primitive_units
+    # create_primitive_units()
+    # if create_admin_user:
+    #     from nbs.models.user import create_admin_user
+    #     create_admin_user()
+    # if with_fixtures:
+    #     from nbs.sample_data import install_fixtures
+    #     install_fixtures()
+
 
 @manager.command
 def dropdb():
     """Drops all database tables"""
     if prompt_bool("Are you sure ? You will lose all your data!"):
         db.drop_all()
+
 
 def shell_make_context():
     from datetime import datetime
@@ -48,6 +51,7 @@ def shell_make_context():
 manager.add_command("shell", Shell(make_context=shell_make_context))
 manager.add_command("clean", Clean())
 manager.add_command("show-urls", ShowUrls())
+
 
 class GunicornServer(Command):
     "Run the app within Gunicorn"
@@ -104,6 +108,6 @@ class PyTest(Command):
 
 manager.add_command("test", PyTest())
 
+
 def main():
     manager.run()
-
