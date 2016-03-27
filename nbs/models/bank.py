@@ -7,7 +7,7 @@ class Bank(db.Model):
     __tablename__ = 'bank'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Unicode, unique=True)
+    name = db.Column(db.Unicode, unique=True, nullable=False)
     # TODO: Add bank logo, to quickly identify
 
     def __repr__(self):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from nbs import create_app
+from nbs.application import create_app
 from nbs.config import TestingConfig
 from nbs.models import db
 
