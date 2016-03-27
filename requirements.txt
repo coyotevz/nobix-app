@@ -1,8 +1,6 @@
-Flask
-SQLAlchemy
 Flask-Script
 Flask-SQLAlchemy
 psycopg2
-webargs
 marshmallow
+webargs
 python-dateutil
