@@ -22,6 +22,47 @@ class TestBank(APITestCase):
         assert b.bcra_code is None
         assert b.cuit is None
 
+    def test_new_bank_with_valid_cuit(self):
+        bank = {'name': 'bna', 'cuit': '30500010912'}
+        rv, data = self.post('/api/banks', data=bank)
+        assert rv.status_code == 201
+
+        b = Bank.query.get(data['id'])
+        assert b.name == bank['name']
+        assert b.cuit == bank['cuit']
+        assert b.bcra_code is None
+
+    def test_new_bank_with_invalid_cuit(self):
+        bank = {'name': 'bna', 'cuit': '30500010312'}
+        rv, data = self.post('/api/banks', data=bank)
+        assert rv.status_code == 422
+        assert data['messages']['cuit'] == ['CUIT field invalid.']
+        assert Bank.query.count() == 0
+
+    def test_new_bank_with_invalid_cuit_length(self):
+        bank1 = {'name': 'bna', 'cuit': '3050001091'}
+        bank2 = {'name': 'bna', 'cuit': '305000109121'}
+
+        rv, data = self.post('/api/banks', data=bank1)
+        assert rv.status_code == 422
+        assert data['messages']['cuit'] == ['CUIT field invalid.']
+
+        rv, data = self.post('/api/banks', data=bank2)
+        assert rv.status_code == 422
+        assert data['messages']['cuit'] == ['CUIT field invalid.']
+
+        assert Bank.query.count() == 0
+
+    def test_new_bank_with_bcra_code(self):
+        bank = {'name': 'bna', 'bcra_code': '0043'}
+        rv, data = self.post('/api/banks', data=bank)
+        assert rv.status_code == 201
+
+        b = Bank.query.get(data['id'])
+        assert b.name == bank['name']
+        assert b.cuit is None
+        assert b.bcra_code == bank['bcra_code']
+
 
 class TestBankAccountType(APITestCase):
 

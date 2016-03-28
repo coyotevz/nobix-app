@@ -8,11 +8,14 @@ from marshmallow.validate import Length
 
 from nbs.models import db, Bank, BankAccount, BankAccountType
 from nbs.utils.api import build_result
+from nbs.utils.validators import validate_cuit
 
 
 class BankSchema(Schema):
     id = fields.Integer(dump_only=True)
     name = fields.String(required=True, validate=[Length(min=2)])
+    bcra_code = fields.String(validate=[Length(max=8)])
+    cuit = fields.String()
 
     @validates('name')
     def validate_unique_name(self, value):
@@ -21,6 +24,12 @@ class BankSchema(Schema):
             if self.context.get('bank_id', None) == exists.id:
                 return True
             raise ValidationError('Bank name must be unique.', status_code=409)
+
+    @validates('cuit')
+    def validate_valid_cuit(self, value):
+        if not validate_cuit(value):
+            raise ValidationError("CUIT field invalid.")
+        return True
 
     @post_load
     def make_bank(self, data):
