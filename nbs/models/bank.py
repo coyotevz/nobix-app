@@ -17,7 +17,9 @@ class Bank(db.Model):
 
     @validates('cuit')
     def cuit_is_valid(self, key, cuit):
-        assert validate_cuit(cuit)
+        if not validate_cuit(cuit):
+            raise ValueError("CUIT invalid")
+        return cuit
 
     def __repr__(self):
         return "<Bank '{}'>".format(self.name)
@@ -52,7 +54,9 @@ class BankAccount(db.Model):
 
     @validates('cbu')
     def cbu_is_valid(self, key, cbu):
-        assert validate_cbu(cbu)
+        if not validate_cbu(cbu):
+            raise ValueError("CBU invalid")
+        return cbu
 
     def __repr__(self):
         return "<BankAccount '{}, {}: {}' of '{}'>".format(

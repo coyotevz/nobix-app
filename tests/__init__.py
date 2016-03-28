@@ -34,3 +34,16 @@ class DBTestCase(TestCase):
     def teardown(self):
         self.db.drop_all()
         super(DBTestCase, self).teardown()
+
+    def add(self, thing):
+        self.db.session.add(thing)
+
+    def add_all(self, things):
+        self.db.session.add_all(things)
+
+    def commit(self):
+        self.db.session.commit()
+
+    def add_commit(self, thing):
+        self.db.session.add(thing)
+        self.db.session.commit()
