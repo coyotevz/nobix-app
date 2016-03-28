@@ -20,7 +20,7 @@ class BankSchema(Schema):
         if exists is not None:
             if self.context.get('bank_id', None) == exists.id:
                 return True
-            raise ValidationError('Bank name must be unique', status_code=409)
+            raise ValidationError('Bank name must be unique.', status_code=409)
 
     @post_load
     def make_bank(self, data):
@@ -34,6 +34,23 @@ class BankAccountTypeSchema(Schema):
     name = fields.String(required=True, validate=[Length(min=2)])
     abbr = fields.String()
 
+    @validates('name')
+    def validate_unique_name(self, value):
+        exists = BankAccountType.query.filter(BankAccountType.name==value).first()
+        if exists is not None:
+            if self.context.get('bank_account_type_id', None) == exists.id:
+                return True
+            raise ValidationError('BankAccountType name must be unique.',
+                                  status_code=409)
+
+    @validates('abbr')
+    def validate_unique_abbr(self, value):
+        exists = BankAccountType.query.filter(BankAccountType.abbr==value).first()
+        if exists is not None:
+            if self.context.get('bank_account_type_id', None) == exists.id:
+                return True
+            raise ValidationError('BankAccountType abbr must be unique.',
+                                  status_code=409)
     @post_load
     def make_acc_type(self, data):
         if self.partial:
@@ -50,7 +67,7 @@ def list_banks():
 
 @bank_api.route('', methods=['POST'])
 def new_bank():
-    bank = parser.parse(BankSchema())
+    bank = parser.parse(BankSchema(strict=True))
     db.session.add(bank)
     db.session.commit()
     # only return id of created Bank, we don't have individual receivers
@@ -81,7 +98,7 @@ def list_account_types():
 
 @bank_api.route('/account_types', methods=['POST'])
 def new_accout_type():
-    acc_type = parser.parse(BankAccountTypeSchema())
+    acc_type = parser.parse(BankAccountTypeSchema(strict=True))
     db.session.add(acc_type)
     db.session.commit()
     return jsonify({'id': acc_type.id}), 201
