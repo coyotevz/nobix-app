@@ -22,6 +22,14 @@ class TestBank(APITestCase):
         assert b.bcra_code is None
         assert b.cuit is None
 
+    def test_new_bank_unique_name(self):
+        bank = {'name': 'bna'}
+        rv, data = self.post('/api/banks', data=bank)
+        assert rv.status_code == 201
+        rv, data = self.post('/api/banks', data=bank)
+        assert rv.status_code == 422
+        assert data['messages']['name'] == ['Bank name must be unique.']
+
     def test_new_bank_with_valid_cuit(self):
         bank = {'name': 'bna', 'cuit': '30500010912'}
         rv, data = self.post('/api/banks', data=bank)
@@ -62,6 +70,24 @@ class TestBank(APITestCase):
         assert b.name == bank['name']
         assert b.cuit is None
         assert b.bcra_code == bank['bcra_code']
+
+
+    def test_list_bank(self):
+        bnames = [{'name': 'bna1'}, {'name': 'bna2'}, {'name': 'bna3'}]
+        banks = [Bank(**d) for d in bnames]
+        self.db.session.add_all(banks)
+        self.db.session.commit()
+
+        rv, data = self.get('/api/banks')
+        assert rv.status_code == 200
+        assert data['num_results'] == 3
+        assert len(data['objects']) == 3
+
+        assert data['objects'] == [
+            {'id': 1, 'name': 'bna1', 'bcra_code': None, 'cuit': None},
+            {'id': 2, 'name': 'bna2', 'bcra_code': None, 'cuit': None},
+            {'id': 3, 'name': 'bna3', 'bcra_code': None, 'cuit': None}
+        ]
 
 
 class TestBankAccountType(APITestCase):
