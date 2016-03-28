@@ -45,11 +45,11 @@ class TestBank(APITestCase):
 
         rv, data = self.post('/api/banks', data=bank1)
         assert rv.status_code == 422
-        assert data['messages']['cuit'] == ['CUIT field invalid.']
+        assert data['messages']['cuit'] == ['Length must be 11.']
 
         rv, data = self.post('/api/banks', data=bank2)
         assert rv.status_code == 422
-        assert data['messages']['cuit'] == ['CUIT field invalid.']
+        assert data['messages']['cuit'] == ['Length must be 11.']
 
         assert Bank.query.count() == 0
 

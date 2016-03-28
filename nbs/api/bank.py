@@ -15,7 +15,7 @@ class BankSchema(Schema):
     id = fields.Integer(dump_only=True)
     name = fields.String(required=True, validate=[Length(min=2)])
     bcra_code = fields.String(validate=[Length(max=8)])
-    cuit = fields.String()
+    cuit = fields.String(validate=[Length(equal=11)])
 
     @validates('name')
     def validate_unique_name(self, value):
