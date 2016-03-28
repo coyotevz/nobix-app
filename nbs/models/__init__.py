@@ -13,7 +13,7 @@ from nbs.models.supplier import Supplier
 from nbs.models.contact import Contact, SupplierContact
 from nbs.models.hr import Employee, AttendanceRecord
 from nbs.models.fiscal import FiscalData
-from nbs.models.bank import Bank, BankAccount
+from nbs.models.bank import Bank, BankAccount, BankAccountType
 from nbs.models.document import (
     PurchaseDocument, PurchaseOrder, PurchaseOrderItem
 )

@@ -6,7 +6,7 @@ from webargs.flaskparser import parser
 from marshmallow import Schema, fields, validates, ValidationError, post_load
 from marshmallow.validate import Length
 
-from nbs.models import db, Bank, BankAccount
+from nbs.models import db, Bank, BankAccount, BankAccountType
 from nbs.utils.api import build_result
 
 
@@ -29,6 +29,18 @@ class BankSchema(Schema):
         return Bank(**data)
 
 
+class BankAccountTypeSchema(Schema):
+    id = fields.Integer(dump_only=True)
+    name = fields.String(required=True, validate=[Length(min=2)])
+    abbr = fields.String()
+
+    @post_load
+    def make_acc_type(self, data):
+        if self.partial:
+            return data
+        return BankAccountType(**data)
+
+
 bank_api = Blueprint('api.bank', __name__, url_prefix='/api/banks')
 
 @bank_api.route('')
@@ -41,7 +53,7 @@ def new_bank():
     bank = parser.parse(BankSchema())
     db.session.add(bank)
     db.session.commit()
-    # only return id of created Bank, we don't have individual relceivers
+    # only return id of created Bank, we don't have individual receivers
     return jsonify({'id': bank.id}), 201
 
 @bank_api.route('/<int:id>', methods=['PATCH'])
@@ -64,4 +76,12 @@ def delete_bank(id):
 
 @bank_api.route('/account_types')
 def list_account_types():
-    return jsonify(**BankAccount._account_types)
+    q = BankAccountType.query.order_by(BankAccountType.name)
+    return build_result(q, BankAccountTypeSchema())
+
+@bank_api.route('/account_types', methods=['POST'])
+def new_accout_type():
+    acc_type = parser.parse(BankAccountTypeSchema())
+    db.session.add(acc_type)
+    db.session.commit()
+    return jsonify({'id': acc_type.id}), 201
