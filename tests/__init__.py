@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import json
 from nbs.application import create_app
 from nbs.config import TestingConfig
 from nbs.models import db
+
+
+def json_data(resp):
+    return json.loads(resp.data.decode('utf-8'))
 
 
 class TestCase(object):
@@ -14,26 +19,41 @@ class TestCase(object):
 
     def setup(self):
         self.app = create_app(config=TestingConfig)
+        #self.client = self.app.test_client()
         self._app_context = self.app.app_context()
         self._app_context.push()
-        self.client = self.app.test_client()
-
-    def teardown(self):
-        self._app_context.pop()
-        self.app = None
-
-
-class DBTestCase(TestCase):
-    """Base class for tests that involves database operations"""
-
-    def setup(self):
-        super(DBTestCase, self).setup()
         self.db = db
         self.db.create_all()
 
     def teardown(self):
         self.db.drop_all()
-        super(DBTestCase, self).teardown()
+        self._app_context.pop()
+        self.app = None
+
+
+class APITestCase(TestCase):
+
+    def setup(self):
+        super(APITestCase, self).setup()
+        self.client = self.app.test_client()
+
+    def teardown(self):
+        self.client = None
+        super(APITestCase, self).teardown()
+
+    def get(self, *args, **kwargs):
+        rv = self.client.get(*args, **kwargs)
+        assert rv.mimetype == 'application/json'
+        return rv, json_data(rv)
+
+    def post(self, *args, **kwargs):
+        rv = self.client.post(*args, **kwargs)
+        assert rv.mimetype == 'application/json'
+        return rv, json_data(rv)
+
+
+class DBTestCase(TestCase):
+    """Base class for tests that involves database operations"""
 
     def add(self, thing):
         self.db.session.add(thing)
