@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, jsonify, url_for, abort
+from flask import Blueprint, url_for, abort
 from webargs.flaskparser import parser
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from marshmallow.validate import Length
@@ -149,7 +149,7 @@ def delete_supplier(id):
 
 @supplier_api.route('/freight_types')
 def list_freight_types():
-    return jsonify(**Supplier._freight_types)
+    return dict(**Supplier._freight_types)
 
 
 @supplier_api.route('/<int:id>/accounts')

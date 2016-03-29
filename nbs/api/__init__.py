@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, jsonify, url_for
+from flask import Blueprint, url_for
 
 #from nbs.api.user import UserApi
 #from nbs.api.supplier import SupplierApi
@@ -16,16 +16,14 @@ api = Blueprint('api', __name__, url_prefix='/api')
 
 @api.route('')
 def index():
-    return jsonify({
+    return {
         'message': "This is api root.",
         'docs': url_for('api.documentation'),
-    })
+    }
 
 @api.route('/docs')
 def documentation():
-    return jsonify({
-        'message': "Documentation",
-    })
+    return {'message': "Documentation"}
 
 def configure_api(app):
     app.register_blueprint(api)

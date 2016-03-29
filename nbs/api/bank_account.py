@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import jsonify, url_for, abort
+from flask import url_for, abort
 from sqlalchemy.exc import IntegrityError
 from webargs import ValidationError
 from nbs.models import db, Bank, BankAccount
@@ -86,7 +86,7 @@ class BankApi(ResourceApi):
         db.session.add(b)
         db.session.commit()
         # Only return id of created Bank, we don't have individual retrieves
-        return jsonify({'id': b.id}), 201
+        return {'id': b.id}, 201
 
     @route('<int:id>', methods=['DELETE'])
     def delete(self, id):
@@ -99,4 +99,4 @@ class BankApi(ResourceApi):
         return '', 204
 
     def account_types(self):
-        return jsonify(**BankAccount._account_type)
+        return dict(**BankAccount._account_type)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import jsonify, url_for, abort
+from flask import url_for, abort
 from nbs.models import db, PurchaseOrder, PurchaseOrderItem
 from marshmallow import Schema, fields
 from nbs.schema import TimestampSchema

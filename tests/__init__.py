@@ -19,7 +19,6 @@ class TestCase(object):
 
     def setup(self):
         self.app = create_app(config=TestingConfig)
-        #self.client = self.app.test_client()
         self._app_context = self.app.app_context()
         self._app_context.push()
         self.db = db

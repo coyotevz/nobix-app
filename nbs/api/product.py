@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import jsonify, request, url_for
+from flask import request, url_for
 from nbs.models import db, Product
 from nbs.schema import ProductSchema
 from nbs.utils.api import ResourceApi, build_result, route

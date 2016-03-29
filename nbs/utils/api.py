@@ -4,7 +4,7 @@ import re
 import copy
 from math import ceil
 
-from flask import request, jsonify
+from flask import request
 from marshmallow.utils import is_collection
 
 class Pagination(object):
@@ -65,4 +65,4 @@ def build_result(query, schema):
     else:
         out = schema.dump(items, many=False).data
 
-    return jsonify(out)
+    return out

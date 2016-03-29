@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, jsonify, abort
+from flask import Blueprint, abort
 from sqlalchemy.exc import IntegrityError
 from webargs.flaskparser import parser
 from marshmallow import Schema, fields, validates, ValidationError, post_load
@@ -79,8 +79,7 @@ def new_bank():
     bank = parser.parse(BankSchema(strict=True))
     db.session.add(bank)
     db.session.commit()
-    # only return id of created Bank, we don't have individual receivers
-    return jsonify({'id': bank.id}), 201
+    return {'id': bank.id}, 201
 
 @bank_api.route('/<int:id>')
 def get_bank(id):
@@ -116,7 +115,7 @@ def new_accout_type():
     acc_type = parser.parse(BankAccountTypeSchema(strict=True))
     db.session.add(acc_type)
     db.session.commit()
-    return jsonify({'id': acc_type.id}), 201
+    return {'id': acc_type.id}, 201
 
 @bank_api.route('/account_types/<int:id>', methods=['PATCH'])
 def update_account_type(id):

@@ -89,6 +89,35 @@ class TestBank(APITestCase):
             {'id': 3, 'name': 'bna3', 'bcra_code': None, 'cuit': None}
         ]
 
+    def test_update_bank(self):
+        b = Bank(name='bna', cuit='30500010912')
+        self.db.session.add(b)
+        self.db.session.commit()
+
+        rv, data = self.get('/api/banks')
+        assert rv.status_code == 200
+        assert data['num_results'] == 1
+
+        rv, data = self.patch('/api/banks/{}'.format(b.id),
+                              data={'name': 'bnb'})
+        assert rv.status_code == 204
+        assert b.name == 'bnb'
+
+    def test_update_invalid_cuit(self):
+        b = Bank(name='bna', cuit='30500010912')
+        self.db.session.add(b)
+        self.db.session.commit()
+
+        rv, data = self.get('/api/banks')
+        assert rv.status_code == 200
+        assert data['num_results'] == 1
+
+        rv, data = self.patch('/api/banks/{}'.format(b.id),
+                              data={'cuit': '30500010312'})
+        assert rv.status_code == 422
+        assert data['messages']['cuit'] == ['CUIT field invalid.']
+        assert b.cuit == '30500010912'
+
 
 class TestBankAccountType(APITestCase):
 

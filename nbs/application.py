@@ -21,6 +21,12 @@ DEFAULT_APPNAME = 'nobix-app-server'
 class JSONTypeResponse(Response):
     default_mimetype = 'application/json'
 
+    @classmethod
+    def force_type(cls, rv, environ=None):
+        if isinstance(rv, dict):
+            rv = jsonify(rv)
+        return super(JSONTypeResponse, cls).force_type(rv, environ)
+
 
 def create_app(config=None, app_name=None):
 
@@ -109,7 +115,7 @@ def configure_app(app, config=None):
         err = {'error': str(ex)}
         if hasattr(ex, 'data') and 'messages' in ex.data:
             err.update({'messages': ex.data['messages']})
-        return make_response(jsonify(err),
+        return make_response(err,
                              ex.code if isinstance(ex, HTTPException) else 500)
 
     for code in default_exceptions.keys():

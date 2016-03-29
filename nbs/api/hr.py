@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import jsonify, request, url_for
+from flask import request, url_for
 from webargs import ValidationError
 from nbs.models import db, Employee, AttendanceRecord
 from nbs.schema import EmployeeSchema, AttendanceRecordSchema
