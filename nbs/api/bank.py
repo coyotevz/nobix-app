@@ -82,6 +82,11 @@ def new_bank():
     # only return id of created Bank, we don't have individual receivers
     return jsonify({'id': bank.id}), 201
 
+@bank_api.route('/<int:id>')
+def get_bank(id):
+    bank = Bank.query.get_or_404(id)
+    return build_result(bank, BankSchema())
+
 @bank_api.route('/<int:id>', methods=['PATCH'])
 def update_bank(id):
     args = parser.parse(BankSchema(partial=True))
