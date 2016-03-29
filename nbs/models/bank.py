@@ -49,8 +49,8 @@ class BankAccount(db.Model):
     bank_id = db.Column(db.Integer, db.ForeignKey('bank.id'), nullable=False)
     bank = db.relationship(Bank, backref="accounts")
 
-    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.supplier_id'))
-    supplier = db.relationship('Supplier', backref='bank_accounts')
+    entity_id = db.Column(db.Integer, db.ForeignKey('entity.id'))
+    entity = db.relationship('Entity', backref='bank_accounts')
 
     @validates('cbu')
     def cbu_is_valid(self, key, cbu):
@@ -61,5 +61,5 @@ class BankAccount(db.Model):
     def __repr__(self):
         return "<BankAccount '{}, {}: {}' of '{}'>".format(
             self.bank.name, self.type.name, self.number,
-            self.supplier.name
+            self.entity
         )
