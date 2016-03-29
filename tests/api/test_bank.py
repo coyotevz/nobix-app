@@ -162,3 +162,18 @@ class TestBankAccountType(APITestCase):
             {'id': 2, 'name': 'a2', 'abbr': 'A2'},
             {'id': 3, 'name': 'a3', 'abbr': None}
         ]
+
+    def test_update_account_type(self):
+        acc_type = BankAccountType(name='acc_type', abbr='AT')
+        self.db.session.add(acc_type)
+        self.db.session.commit()
+
+        rv, data = self.get('/api/banks/account_types')
+        assert rv.status_code == 200
+        assert data['num_results'] == 1
+
+        rv, data = self.patch('/api/banks/account_types/{}'.format(acc_type.id),
+                              data={'abbr': 'at'})
+        assert rv.status_code == 204
+
+        assert acc_type.abbr == 'at'

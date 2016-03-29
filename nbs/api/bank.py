@@ -89,9 +89,10 @@ def get_bank(id):
 
 @bank_api.route('/<int:id>', methods=['PATCH'])
 def update_bank(id):
-    args = parser.parse(BankSchema(partial=True))
+    args = parser.parse(BankSchema(strict=True, partial=True))
     bank = Bank.query.get_or_404(id)
-    bank.name = args['name']
+    for key, value in args.items():
+        setattr(bank, key, value)
     db.session.commit()
     return '', 204
 
@@ -116,3 +117,22 @@ def new_accout_type():
     db.session.add(acc_type)
     db.session.commit()
     return jsonify({'id': acc_type.id}), 201
+
+@bank_api.route('/account_types/<int:id>', methods=['PATCH'])
+def update_account_type(id):
+    args = parser.parse(BankAccountTypeSchema(strict=True, partial=True))
+    acc_type = BankAccountType.query.get_or_404(id)
+    for key, value in args.items():
+        setattr(acc_type, key, value)
+    db.session.commit()
+    return '', 204
+
+@bank_api.route('/account_types/<int:id>', methods=['DELETE'])
+def delete_account_type(id):
+    acc_type = BankAccountType.query.get_or_404(id)
+    db.session.delete(acc_type)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        abort(409, description='Unable to delete account type')
+    return '', 204

@@ -51,6 +51,11 @@ class APITestCase(TestCase):
         assert rv.mimetype == 'application/json'
         return rv, json_data(rv)
 
+    def patch(self, *args, **kwargs):
+        rv = self.client.patch(*args, **kwargs)
+        assert rv.mimetype == 'application/json'
+        return rv, json_data(rv)
+
 
 class DBTestCase(TestCase):
     """Base class for tests that involves database operations"""
