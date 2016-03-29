@@ -7,7 +7,7 @@ from nbs.models import db
 
 
 def json_data(resp):
-    return json.loads(resp.data.decode('utf-8'))
+    return json.loads(resp.data.decode('utf-8') if len(resp.data) else '{}')
 
 
 class TestCase(object):

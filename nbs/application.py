@@ -3,7 +3,7 @@
 import locale
 locale.setlocale(locale.LC_ALL, '')
 
-from flask import Flask, request, make_response, jsonify
+from flask import Flask, Response, request, make_response, jsonify
 from werkzeug.exceptions import default_exceptions, HTTPException
 from webargs.flaskparser import abort
 
@@ -18,12 +18,17 @@ from nbs.utils.converters import (
 DEFAULT_APPNAME = 'nobix-app-server'
 
 
+class JSONTypeResponse(Response):
+    default_mimetype = 'application/json'
+
+
 def create_app(config=None, app_name=None):
 
     if app_name is None:
         app_name = DEFAULT_APPNAME
 
     app = Flask(app_name, static_folder=None)
+    app.response_class = JSONTypeResponse
 
     configure_app(app, config)
     configure_db(app)
