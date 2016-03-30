@@ -55,6 +55,11 @@ class APITestCase(TestCase):
         assert rv.mimetype == 'application/json'
         return rv, json_data(rv)
 
+    def delete(self, *args, **kwargs):
+        rv = self.client.delete(*args, **kwargs)
+        assert rv.mimetype == 'application/json'
+        return rv, json_data(rv)
+
 
 class DBTestCase(TestCase):
     """Base class for tests that involves database operations"""

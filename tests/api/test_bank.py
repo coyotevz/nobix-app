@@ -118,18 +118,51 @@ class TestBank(APITestCase):
         assert data['messages']['cuit'] == ['CUIT field invalid.']
         assert b.cuit == '30500010912'
 
+    def test_update_duplicated_name(self):
+        b1 = Bank(name='b1')
+        b2 = Bank(name='b2')
+        self.db.session.add_all([b1, b2])
+        self.db.session.commit()
+
+        rv, data = self.patch('/api/banks/{}'.format(b2.id),
+                              data={'name': 'b1'})
+        assert rv.status_code == 422
+        assert data['messages']['name'] == ['Bank name must be unique.']
+        assert b1.name == 'b1'
+
+    def test_update_same_name(self):
+        b = Bank(name='bna')
+        self.db.session.add(b)
+        self.db.session.commit()
+
+        rv, data = self.patch('/api/banks/{}'.format(b.id),
+                              data={'name': 'bna'})
+        assert rv.status_code == 204
+        assert b.name == 'bna'
+
+    def test_delete_bank(self):
+        b = Bank(name='bna')
+        self.db.session.add(b)
+        self.db.session.commit()
+
+        rv, data = self.delete('/api/banks/{}'.format(b.id))
+        assert rv.status_code == 204
+        assert Bank.query.get(b.id) is None
+
 
 class TestBankAccountType(APITestCase):
 
+    c_url = '/api/banks/account_types'
+    i_url = '/api/banks/account_types/{}'
+
     def test_initial_empty_list(self):
-        rv, data = self.get('/api/banks/account_types')
+        rv, data = self.get(self.c_url)
         assert rv.status_code == 200
         assert data['num_results'] == 0
         assert len(data['objects']) == 0
 
     def test_new_account_type(self):
-        rv, data = self.post('/api/banks/account_types',
-                             data={'name': 'acc_type'})
+        rv, data = self.post(self.c_url, data={'name': 'acc_type'})
         assert rv.status_code == 201
         assert list(data.keys()) == ['id']
 
@@ -138,7 +171,7 @@ class TestBankAccountType(APITestCase):
         assert acc.abbr is None
 
     def test_new_account_type_with_abbr(self):
-        rv, data = self.post('/api/banks/account_types',
+        rv, data = self.post(self.c_url,
                              data={'name': 'acc_type', 'abbr': 'AT'})
         assert rv.status_code == 201
 
@@ -147,31 +180,29 @@ class TestBankAccountType(APITestCase):
         assert acc.abbr == 'AT'
 
     def test_new_account_type_ignore_bad_args(self):
-        rv, data = self.post('/api/banks/account_types',
+        rv, data = self.post(self.c_url,
                              data={'name': 'acc_type', 'bad_arg': 5})
         assert rv.status_code == 201
         assert list(data.keys()) == ['id']
 
     def test_name_min_length(self):
-        rv, data = self.post('/api/banks/account_types', data={'name': 'a'})
+        rv, data = self.post(self.c_url, data={'name': 'a'})
         assert rv.status_code == 422
         assert data['messages']['name'] == ["Shorter than minimum length 2."]
 
     def test_unique_name(self):
-        rv, data = self.post('/api/banks/account_types',
-                             data={'name': 'acc_type'})
+        rv, data = self.post(self.c_url, data={'name': 'acc_type'})
         assert rv.status_code == 201
-        rv, data = self.post('/api/banks/account_types',
-                             data={'name': 'acc_type'})
+        rv, data = self.post(self.c_url, data={'name': 'acc_type'})
         assert rv.status_code == 422
         assert data['messages']['name'] == \
                 ["BankAccountType name must be unique."]
 
     def test_unique_abbr(self):
-        rv, data = self.post('/api/banks/account_types',
+        rv, data = self.post(self.c_url,
                              data={'name': 'acc_type', 'abbr': 'AT'})
         assert rv.status_code == 201
-        rv, data = self.post('/api/banks/account_types',
+        rv, data = self.post(self.c_url,
                              data={'name': 'ac_type', 'abbr': 'AT'})
         assert rv.status_code == 422
         assert data['messages']['abbr'] == \
@@ -184,7 +215,7 @@ class TestBankAccountType(APITestCase):
         self.db.session.add_all([a1, a2, a3])
         self.db.session.commit()
 
-        rv, data = self.get('/api/banks/account_types')
+        rv, data = self.get(self.c_url)
         assert rv.status_code == 200
         assert data['objects'] == [
             {'id': 1, 'name': 'a1', 'abbr': 'A1'},
@@ -197,12 +228,40 @@ class TestBankAccountType(APITestCase):
         self.db.session.add(acc_type)
         self.db.session.commit()
 
-        rv, data = self.get('/api/banks/account_types')
+        rv, data = self.get(self.c_url)
         assert rv.status_code == 200
         assert data['num_results'] == 1
 
-        rv, data = self.patch('/api/banks/account_types/{}'.format(acc_type.id),
+        rv, data = self.patch(self.i_url.format(acc_type.id),
                               data={'abbr': 'at'})
         assert rv.status_code == 204
 
         assert acc_type.abbr == 'at'
+
+    def test_update_same_name(self):
+        acc_type = BankAccountType(name='acc_type')
+        self.db.session.add(acc_type)
+        self.db.session.commit()
+
+        rv, data = self.patch(self.i_url.format(acc_type.id),
+                              data={'name': 'acc_type'})
+        assert rv.status_code == 204
+        assert acc_type.name == 'acc_type'
+
+    def test_update_same_abbr(self):
+        acc_type = BankAccountType(name='acc_type', abbr='AT')
+        self.db.session.add(acc_type)
+        self.db.session.commit()
+
+        rv, data = self.patch(self.i_url.format(acc_type.id),
+                              data={'abbr': 'AT'})
+        assert rv.status_code == 204
+        assert acc_type.abbr == 'AT'
+
+    def test_delete_acc_type(self):
+        acc_type = BankAccountType(name='acc_type')
+        self.db.session.add(acc_type)
+        self.db.session.commit()
+
+        rv, data = self.delete(self.i_url.format(acc_type.id))
+        assert BankAccountType.query.get(acc_type.id) is None

@@ -47,7 +47,7 @@ class BankAccountTypeSchema(Schema):
     def validate_unique_name(self, value):
         exists = BankAccountType.query.filter(BankAccountType.name==value).first()
         if exists is not None:
-            if self.context.get('bank_account_type_id', None) == exists.id:
+            if self.context.get('acc_type_id', None) == exists.id:
                 return True
             raise ValidationError('BankAccountType name must be unique.',
                                   status_code=409)
@@ -56,7 +56,7 @@ class BankAccountTypeSchema(Schema):
     def validate_unique_abbr(self, value):
         exists = BankAccountType.query.filter(BankAccountType.abbr==value).first()
         if exists is not None:
-            if self.context.get('bank_account_type_id', None) == exists.id:
+            if self.context.get('acc_type_id', None) == exists.id:
                 return True
             raise ValidationError('BankAccountType abbr must be unique.',
                                   status_code=409)
@@ -88,8 +88,9 @@ def get_bank(id):
 
 @bank_api.route('/<int:id>', methods=['PATCH'])
 def update_bank(id):
-    args = parser.parse(BankSchema(strict=True, partial=True))
     bank = Bank.query.get_or_404(id)
+    args = parser.parse(BankSchema(strict=True, partial=True,
+                                   context={'bank_id': bank.id}))
     for key, value in args.items():
         setattr(bank, key, value)
     db.session.commit()
@@ -119,8 +120,9 @@ def new_accout_type():
 
 @bank_api.route('/account_types/<int:id>', methods=['PATCH'])
 def update_account_type(id):
-    args = parser.parse(BankAccountTypeSchema(strict=True, partial=True))
     acc_type = BankAccountType.query.get_or_404(id)
+    args = parser.parse(BankAccountTypeSchema(strict=True, partial=True,
+                        context={'acc_type_id': acc_type.id}))
     for key, value in args.items():
         setattr(acc_type, key, value)
     db.session.commit()
