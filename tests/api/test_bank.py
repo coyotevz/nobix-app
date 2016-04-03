@@ -103,7 +103,7 @@ class TestBank(APITestCase):
 
         rv, data = self.patch(self.i_url.format(b.id),
                               data={'name': 'bnb'})
-        assert rv.status_code == 204
+        assert rv.status_code == 200
         assert b.name == 'bnb'
 
     def test_update_invalid_cuit(self):
@@ -140,7 +140,7 @@ class TestBank(APITestCase):
 
         rv, data = self.patch(self.i_url.format(b.id),
                               data={'name': 'bna'})
-        assert rv.status_code == 204
+        assert rv.status_code == 200
         assert b.name == 'bna'
 
     def test_delete_bank(self):
@@ -237,7 +237,7 @@ class TestBankAccountType(APITestCase):
 
         rv, data = self.patch(self.i_url.format(acc_type.id),
                               data={'abbr': 'at'})
-        assert rv.status_code == 204
+        assert rv.status_code == 200
 
         assert acc_type.abbr == 'at'
 
@@ -248,7 +248,7 @@ class TestBankAccountType(APITestCase):
 
         rv, data = self.patch(self.i_url.format(acc_type.id),
                               data={'name': 'acc_type'})
-        assert rv.status_code == 204
+        assert rv.status_code == 200
         assert acc_type.name == 'acc_type'
 
     def test_update_same_abbr(self):
@@ -258,7 +258,7 @@ class TestBankAccountType(APITestCase):
 
         rv, data = self.patch(self.i_url.format(acc_type.id),
                               data={'abbr': 'AT'})
-        assert rv.status_code == 204
+        assert rv.status_code == 200
         assert acc_type.abbr == 'AT'
 
     def test_delete_acc_type(self):
