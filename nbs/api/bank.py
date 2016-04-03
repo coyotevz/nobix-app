@@ -67,7 +67,7 @@ class BankAccountTypeSchema(Schema):
         return BankAccountType(**data)
 
 
-bank_api = Blueprint('api.bank', __name__, url_prefix='/api/banks')
+bank_api = Blueprint('api.bank', __name__, url_prefix='/api/v1/banks')
 
 @bank_api.route('')
 def list_banks():
