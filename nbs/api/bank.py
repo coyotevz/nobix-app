@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, abort
+from flask import Blueprint, abort, url_for
 from sqlalchemy.exc import IntegrityError
 from webargs.flaskparser import parser
 from marshmallow import Schema, fields, validates, ValidationError, post_load
@@ -79,7 +79,7 @@ def new_bank():
     bank = parser.parse(BankSchema(strict=True))
     db.session.add(bank)
     db.session.commit()
-    return {'id': bank.id}, 201
+    return {'id': bank.id}, 201, {'Location': url_for('.get_bank', id=bank.id)}
 
 @bank_api.route('/<int:id>')
 def get_bank(id):
@@ -94,7 +94,7 @@ def update_bank(id):
     for key, value in args.items():
         setattr(bank, key, value)
     db.session.commit()
-    return '', 204
+    return ''
 
 @bank_api.route('/<int:id>', methods=['DELETE'])
 def delete_bank(id):
@@ -116,7 +116,8 @@ def new_accout_type():
     acc_type = parser.parse(BankAccountTypeSchema(strict=True))
     db.session.add(acc_type)
     db.session.commit()
-    return {'id': acc_type.id}, 201
+    return ({'id': acc_type.id}, 201,
+            {'Location': url_for('.update_account_type', id=acc_type.id)})
 
 @bank_api.route('/account_types/<int:id>', methods=['PATCH'])
 def update_account_type(id):
@@ -126,7 +127,7 @@ def update_account_type(id):
     for key, value in args.items():
         setattr(acc_type, key, value)
     db.session.commit()
-    return '', 204
+    return ''
 
 @bank_api.route('/account_types/<int:id>', methods=['DELETE'])
 def delete_account_type(id):
