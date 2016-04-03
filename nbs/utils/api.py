@@ -7,6 +7,7 @@ from math import ceil
 from flask import request
 from marshmallow.utils import is_collection
 
+
 class Pagination(object):
 
     def __init__(self, iterable, page, per_page):
@@ -31,9 +32,17 @@ def uncamel(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
+
+def apply_query_filters(query):
+    # TODO: Extract filter conditions from url querystring
+    return query
+
+
 def build_result(query, schema):
 
     if is_collection(query):
+        query = apply_query_filters(query)
+
         if hasattr(query, 'paginate') and callable(query.paginate):
             result = query.paginate(request.page, request.per_page)
         else:
