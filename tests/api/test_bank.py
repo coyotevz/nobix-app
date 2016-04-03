@@ -18,7 +18,10 @@ class TestBank(APITestCase):
     def test_new_bank(self):
         rv, data = self.post(self.c_url, data={'name': 'b1'})
         assert rv.status_code == 201
-        assert list(data.keys()) == ['id']
+        assert 'id' in data
+        assert data['name'] == 'b1'
+        assert data['bcra_code'] is None
+        assert data['cuit'] is None
 
         b = Bank.query.get(data['id'])
         assert b.name == 'b1'
@@ -167,7 +170,9 @@ class TestBankAccountType(APITestCase):
     def test_new_account_type(self):
         rv, data = self.post(self.c_url, data={'name': 'acc_type'})
         assert rv.status_code == 201
-        assert list(data.keys()) == ['id']
+        assert 'id' in data
+        assert data['name'] == 'acc_type'
+        assert data['abbr'] is None
 
         acc = BankAccountType.query.get(data['id'])
         assert acc.name == 'acc_type'
@@ -186,7 +191,10 @@ class TestBankAccountType(APITestCase):
         rv, data = self.post(self.c_url,
                              data={'name': 'acc_type', 'bad_arg': 5})
         assert rv.status_code == 201
-        assert list(data.keys()) == ['id']
+        assert 'id' in data
+        assert data['name'] == 'acc_type'
+        assert data['abbr'] is None
+        assert 'bad_arg' not in data
 
     def test_name_min_length(self):
         rv, data = self.post(self.c_url, data={'name': 'a'})
