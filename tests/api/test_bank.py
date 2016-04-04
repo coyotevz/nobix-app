@@ -155,6 +155,17 @@ class TestBank(APITestCase):
         assert rv.status_code == 204
         assert Bank.query.get(b.id) is None
 
+    def test_get_with_filters(self):
+        bnames = [{'name': 'bna'}, {'name': 'cra'}, {'name': 'tzf'}]
+        banks = [Bank(**d) for d in bnames]
+        self.db.session.add_all(banks)
+        self.db.session.commit()
+
+        rv, data = self.get(self.c_url+'?filter=name:eq:bna')
+        assert rv.status_code == 200
+        assert data['num_results'] == 1
+        assert len(data['objects']) == 1
+
 
 class TestBankAccountType(APITestCase):
 

@@ -59,22 +59,6 @@ def configure_app(app, config=None):
     app.url_map.converters['range'] = RangeConverter
     app.url_map.converters['rangelist'] = RangeListConverter
 
-    @app.before_request
-    def set_page_params():
-        max_per_page = app.config.get('MAX_ITEMS_PER_PAGE', 100)
-        request.select = set(
-            ','.join(request.args.getlist('select')).split(',')
-        )
-        request.omit = set(
-            ','.join(request.args.getlist('omit')).split(',')
-        )
-        try:
-            request.page = int(request.args.get('page', 1))
-            request.per_page = min(int(request.args.get('per_page', 25)),
-                                   max_per_page)
-        except ValueError:
-            abort(400, message='Invalid parameter type')
-
     @app.after_request
     def add_cors_headers(response):
         if 'Origin' in request.headers:

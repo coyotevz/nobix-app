@@ -7,7 +7,7 @@ from marshmallow import Schema, fields, validates, ValidationError, post_load
 from marshmallow.validate import Length
 
 from nbs.models import db, Bank, BankAccount, BankAccountType
-from nbs.utils.api import build_result
+from nbs.lib.rest import build_result
 from nbs.utils.validators import validate_cuit
 
 
