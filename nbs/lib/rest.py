@@ -6,7 +6,7 @@
 
     Provides tools for building REST interfaces.
     primary function built_result().
-    
+
     Limitations:
     - Only work for simple queries agains one model.
 
@@ -106,7 +106,7 @@ def parse_filters(filters):
 
 def create_operation(model, fieldname, operator, argument, relation=None):
     """
-    Translate an operation described as string to a valida SQLAlchemy query
+    Translate an operation described as string to a valid SQLAlchemy query
     parameter using a field or relation of the model.
     """
     opfunc = OPERATORS.get(operator)
